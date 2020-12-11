@@ -61,7 +61,8 @@ namespace roguelike.Systems
                     EventBus.Publish(new BeforeMovementEvent {
                         Actor = ev.Actor,
                         From = entity.Entity.Position,
-                        To = to
+                        To = to,
+                        ActivateIn = movement.Speed
                     });
 
                     EventBus.Publish(new ActorTurnEvent {
