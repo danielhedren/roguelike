@@ -132,7 +132,7 @@ namespace roguelike.Consoles
                 Level.Actors = actors;
             }
 
-            var handledInput = Player.ProcessKeyboard(info);
+            var handledInput = Player.ProcessKeyboard(info, Level);
 
             if (handledInput) Level.Update();
 

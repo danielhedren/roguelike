@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using roguelike.Actors;
@@ -46,6 +47,7 @@ namespace roguelike.Systems
                     Actor = ev.Actor,
                     From = ev.From,
                     To = ev.To,
+                    Interrupt = ev.Actor == level.GetActors<Player>().First()
                 });
             } else if (e.GetType() == typeof(OnMovementEvent))
             {

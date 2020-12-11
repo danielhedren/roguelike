@@ -72,10 +72,14 @@ namespace roguelike.Actors
 
                 if (attacking != null) {
                     Logging.Log("Player wanted to attack!");
+
+                    EventBus.Publish(new InterruptEvent());
                 } else {
                     EventBus.Publish(new BeforeMovementEvent {
                         Actor = this,
                         From = currentPosition,
+                        To = currentPosition + movement,
+                        ActivateIn = Get<MovementComponent>().Speed,
                         InterruptOnCancel = true
                     });
                 }
