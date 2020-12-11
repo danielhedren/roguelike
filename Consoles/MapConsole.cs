@@ -46,8 +46,7 @@ namespace roguelike.Consoles
             foreach (var actor in Level.Actors)
             {
                 EventBus.Publish(new ActorTurnEvent{
-                    Actor = actor,
-                    Interrupt = actor == Player
+                    Actor = actor
                 });
             }
 
