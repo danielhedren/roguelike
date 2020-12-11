@@ -40,13 +40,13 @@ namespace roguelike.Systems
                     var cellsToPlayer = level.Map.GetCellsAlongLine(entity.X, entity.Y, playerEntity.X, playerEntity.Y).Skip(1);
                     Point to;
 
-                    if (cellsToPlayer.Count() > 0 || cellsToPlayer.All(x => x.IsTransparent)) {
+                    if (cellsToPlayer.Count() > 0 || cellsToPlayer.All(x => x.IsTransparent) || ai.PlayerLastSeen != null) {
                         ai.PlayerLastSeen = playerEntity.Position;
-                        to = new Point(cellsToPlayer.First().X, cellsToPlayer.First().Y);
-                    } else if (ai.PlayerLastSeen != null) {
+
                         var pathFinder = new RogueSharp.PathFinder(level.Map);
                         var path = pathFinder.ShortestPath(level.Map.GetCell(entity.X, entity.Y), level.Map.GetCell(ai.PlayerLastSeen.Value.X, ai.PlayerLastSeen.Value.Y));
                         var cell = path.StepForward();
+                        
                         to = new Point(cell.X, cell.Y);
 
                         if (path.CurrentStep == path.End) {
