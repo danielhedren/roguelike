@@ -26,12 +26,21 @@ namespace roguelike.Systems
                 var entity = ev.Actor.Get<EntityComponent>();
                 var movement = ev.Actor.Get<MovementComponent>();
                 var ai = ev.Actor.Get<SimpleAIComponent>();
+                var attack = ev.Actor.Get<MeleeAttackComponent>();
+
+                if (entity != null && attack != null && level.Map.GetBorderCellsInSquare(entity.X, entity.Y, 1).Any(x => x.X == playerEntity.X && x.Y == playerEntity.Y))
+                {
+                    // Attack here
+                    Logging.Log("AI wanted to attack!");
+
+                    return;
+                }
 
                 if (entity != null && movement != null) {
                     var cellsToPlayer = level.Map.GetCellsAlongLine(entity.X, entity.Y, playerEntity.X, playerEntity.Y).Skip(1);
                     Point to;
 
-                    if (cellsToPlayer.All(x => x.IsTransparent)) {
+                    if (cellsToPlayer.Count() > 0 || cellsToPlayer.All(x => x.IsTransparent)) {
                         ai.PlayerLastSeen = playerEntity.Position;
                         to = new Point(cellsToPlayer.First().X, cellsToPlayer.First().Y);
                     } else if (ai.PlayerLastSeen != null) {
@@ -46,11 +55,18 @@ namespace roguelike.Systems
                     } else {
                         to = entity.Entity.Position + new Point(Random.Next(-1, 2), Random.Next(-1, 2));
                     }
+                    
+                    ev.Handled = true;
 
                     EventBus.Publish(new BeforeMovementEvent {
                         Actor = ev.Actor,
                         From = entity.Entity.Position,
                         To = to
+                    });
+
+                    EventBus.Publish(new ActorTurnEvent {
+                        Actor = ev.Actor,
+                        ActivateIn = movement.Speed
                     });
                 }
             }

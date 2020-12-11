@@ -1,8 +1,11 @@
 using System.ComponentModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using roguelike.Actors.Monsters;
 using roguelike.Components;
 using roguelike.Events;
+using roguelike.Utils;
+using roguelike.World;
 using SadConsole;
 
 namespace roguelike.Actors
@@ -11,17 +14,13 @@ namespace roguelike.Actors
     {
         public Player()
         {
-            Components.Add(new EntityComponent());
+            Components.Add(new EntityComponent(Color.White, Color.Transparent, '@'));
             Components.Add(new HealthComponent(100));
             Components.Add(new MovementComponent());
             Components.Add(new MeleeAttackComponent(10));
-
-            var entity = Get<EntityComponent>();
-
-            entity.Entity = new SadConsole.Entities.Entity(Color.White, Color.Transparent, '@');
         }
 
-        public bool ProcessKeyboard(SadConsole.Input.Keyboard info)
+        public bool ProcessKeyboard(SadConsole.Input.Keyboard info, Level level)
         {
             var movement = Point.Zero;
             var handled = false;
@@ -56,12 +55,30 @@ namespace roguelike.Actors
 
             if (movement != Point.Zero) {
                 var currentPosition = Get<EntityComponent>().Position;
+                var entity = Get<EntityComponent>();
 
-                EventBus.Publish(new BeforeMovementEvent {
-                    Actor = this,
-                    From = currentPosition,
-                    To = currentPosition + movement
-                });
+                var monsters = level.GetActors<Monster>();
+                Monster attacking = null;
+
+                foreach (var monster in monsters) {
+                    var mEntity = monster.Get<EntityComponent>();
+
+                    if (mEntity.Position == currentPosition + movement) {
+                        attacking = monster;
+
+                        break;
+                    }
+                }
+
+                if (attacking != null) {
+                    Logging.Log("Player wanted to attack!");
+                } else {
+                    EventBus.Publish(new BeforeMovementEvent {
+                        Actor = this,
+                        From = currentPosition,
+                        To = currentPosition + movement
+                    });
+                }
 
                 handled = true;
             }
