@@ -111,7 +111,7 @@ namespace roguelike.Consoles
 
             var health = Player.Get<HealthComponent>();
 
-            UIConsole.Print(1, 4, $"Health: {health.CurrentHealth}/{health.MaxHealth}");
+            UIConsole.Print(0, 4, $"Health: {health.CurrentHealth}/{health.MaxHealth}");
 
             var monsters = Level.GetActors<Monster>().Where(m => {
                 var e = m.Get<EntityComponent>();
