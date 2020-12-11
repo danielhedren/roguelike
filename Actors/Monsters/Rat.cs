@@ -13,7 +13,7 @@ namespace roguelike.Actors.Monsters
             Components.Add(new EntityComponent(_colors[rand.Next(_colors.Length)], Color.Transparent, 'r'));
             Components.Add(new HealthComponent(10));
             var movementComponent = new MovementComponent();
-            movementComponent.Speed = 0.5;
+            movementComponent.Speed = 0.8;
             Components.Add(movementComponent);
             Components.Add(new MeleeAttackComponent(5));
             Components.Add(new NameComponent("Rat"));
