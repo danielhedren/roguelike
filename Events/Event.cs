@@ -5,6 +5,7 @@ namespace roguelike.Events
         public bool Handled { get; set; } = false;
         public bool StopPropagation { get; set; } = false;
         public bool Interrupt { get; set; } = false;
+        public bool InterruptOnCancel { get; set; } = false;
         public double ActivateIn { get; set; } = 0;
     }
 }

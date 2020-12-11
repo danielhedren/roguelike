@@ -22,6 +22,10 @@ namespace roguelike.Systems
                 var ev = (BeforeMovementEvent) e;
 
                 if (!level.Map.IsWalkable(ev.To.X, ev.To.Y)) {
+                    if (ev.InterruptOnCancel) {
+                        EventBus.Publish(new InterruptEvent());
+                    }
+                    
                     return;
                 }
 
@@ -30,6 +34,10 @@ namespace roguelike.Systems
                 foreach (var entity in entities)
                 {
                     if (entity.Position == ev.To) {
+                        if (ev.InterruptOnCancel) {
+                            EventBus.Publish(new InterruptEvent());
+                        }
+
                         return;
                     }
                 }

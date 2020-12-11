@@ -76,7 +76,7 @@ namespace roguelike.Actors
                     EventBus.Publish(new BeforeMovementEvent {
                         Actor = this,
                         From = currentPosition,
-                        To = currentPosition + movement
+                        InterruptOnCancel = true
                     });
                 }
 
