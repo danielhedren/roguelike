@@ -26,9 +26,10 @@ namespace roguelike.Events
                 }
             }
 
+            var tActivateIn = e.ActivateIn;
             foreach (var e2 in Events)
             {
-                e2.ActivateIn -= e.ActivateIn;
+                e2.ActivateIn -= tActivateIn;
             }
 
             var interrupt = e.Interrupt;
