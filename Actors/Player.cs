@@ -50,6 +50,10 @@ namespace roguelike.Actors
             }
 
             if (info.IsKeyPressed(Keys.NumPad5)) {
+                EventBus.Publish(new InterruptEvent {
+                    ActivateIn = 1
+                });
+
                 handled = true;
             }
 
