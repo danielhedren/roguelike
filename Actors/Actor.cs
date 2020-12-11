@@ -22,13 +22,5 @@ namespace roguelike.Actors
         {
             return Components.FindIndex(x => x.GetType().Equals(typeof(T))) != -1;
         }
-
-        public void UpdateComponents(Level level)
-        {
-            foreach (var component in Components)
-            {
-                component.Update(this, level);
-            }
-        }
     }
 }
