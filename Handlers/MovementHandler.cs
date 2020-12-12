@@ -23,22 +23,23 @@ namespace roguelike.Handlers
                 var ev = (BeforeMovementEvent) e;
 
                 if (!level.Map.IsWalkable(ev.To.X, ev.To.Y)) {
-                    if (ev.InterruptOnCancel) {
-                        EventBus.Publish(new InterruptEvent());
-                    }
+                    ev.Cancel();
                     
                     return;
                 }
 
-                var entities = level.GetActors<Actor>().Where(x => x.Has<EntityComponent>()).Select(x => x.Get<EntityComponent>());
+                var actors = level.GetActors<Actor>().Where(x => x.Has<EntityComponent>());
 
-                foreach (var entity in entities)
+                foreach (var actor in actors)
                 {
-                    if (entity.Position == ev.To) {
-                        if (ev.InterruptOnCancel) {
-                            EventBus.Publish(new InterruptEvent());
-                        }
+                    if (actor == ev.Actor) continue;
 
+                    var entity = actor.Get<EntityComponent>();
+                    var health = actor.Get<HealthComponent>();
+
+                    if (entity.Position == ev.To && (health == null || !health.IsDead)) {
+                        ev.Cancel();
+                        
                         return;
                     }
                 }
@@ -52,6 +53,12 @@ namespace roguelike.Handlers
             } else if (e.GetType() == typeof(OnMovementEvent))
             {
                 var ev = (OnMovementEvent) e;
+
+                if (!level.Actors.Contains(ev.Actor)) {
+                    ev.Cancel();
+
+                    return;
+                }
 
                 var entity = ev.Actor.Get<EntityComponent>();
                 entity.Position = ev.To;
