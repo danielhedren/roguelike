@@ -28,6 +28,10 @@ namespace roguelike.Handlers
                     Logging.Log($"You died!");
                 }
 
+                var corpse = new Corpse();
+                corpse.Get<EntityComponent>().Position = ev.Target.Get<EntityComponent>().Position;
+                level.Actors.Add(corpse);
+
                 ev.Target.Components.Clear();
                 level.Actors.Remove(ev.Target);
             }
