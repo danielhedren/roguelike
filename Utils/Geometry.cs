@@ -5,9 +5,11 @@ namespace roguelike.Utils
 {
     public class Geometry
     {
-        public static bool IsNextTo(Point a, Point b)
+        public static bool IsNextTo(Point? a, Point? b)
         {
-            return (Math.Abs(a.X - b.X) <= 1 && Math.Abs(a.Y - b.Y) <= 1);
+            if (a == null || b == null) return false;
+
+            return (Math.Abs(a.Value.X - b.Value.X) <= 1 && Math.Abs(a.Value.Y - b.Value.Y) <= 1);
         }
     }
 }
