@@ -22,6 +22,7 @@ namespace roguelike.World
             Handlers.Add(new AttackHandler());
             Handlers.Add(new MessageLoggingHandler());
             Handlers.Add(new DamageTakenHandler());
+            Handlers.Add(new TileRevealedHandler());
 
             Handlers.Add(new TurnHandler());
         }

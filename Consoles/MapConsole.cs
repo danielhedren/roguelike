@@ -79,6 +79,13 @@ namespace roguelike.Consoles
 
             foreach (var cell in Level.Map.GetAllCells())
             {
+                if (cell.IsInFov && !cell.IsExplored)
+                {
+                    EventBus.Publish(new OnTileRevealedEvent {
+                        Tile = new Point(cell.X, cell.Y)
+                    });
+                }
+
                 if (cell.IsInFov)
                 {
                     Level.Map.SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
