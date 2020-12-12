@@ -69,12 +69,11 @@ namespace roguelike.Consoles
 
             Level.Map.ComputeFov(entity.Position.X, entity.Position.Y, 20, true);
 
+            Console.Children.Clear();
             foreach (var e in Level.GetComponents<EntityComponent>())
             {
                 if (Level.Map.IsInFov(e.X, e.Y)) {
                     Console.Children.Add(e.Entity);
-                } else {
-                    Console.Children.Remove(e.Entity);
                 }
             }
 
