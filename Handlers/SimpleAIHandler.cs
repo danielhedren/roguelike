@@ -28,11 +28,12 @@ namespace roguelike.Handlers
                 var ai = ev.Actor.Get<SimpleAIComponent>();
                 var attack = ev.Actor.Get<MeleeAttackComponent>();
 
-                if (entity != null && attack != null && level.Map.GetBorderCellsInSquare(entity.X, entity.Y, 1).Any(x => x.X == playerEntity.X && x.Y == playerEntity.Y))
+                if (entity != null && attack != null && Geometry.IsNextTo(entity.Position, playerEntity.Position))
                 {
                     EventBus.Publish(new BeforeMeleeAttackEvent {
                         Attacker = ev.Actor,
-                        Target = player,
+                        IntendedTarget = player,
+                        TargetPoint = playerEntity.Entity.Position,
                         Damage = attack.Damage,
                         ActivateIn = attack.Speed
                     });
@@ -42,16 +43,20 @@ namespace roguelike.Handlers
 
                 if (entity != null && movement != null) {
                     var cellsToPlayer = level.Map.GetCellsAlongLine(entity.X, entity.Y, playerEntity.X, playerEntity.Y).Skip(1);
-                    Point to;
+                    Point to = entity.Entity.Position;
 
-                    if (cellsToPlayer.Count() > 0 || cellsToPlayer.All(x => x.IsTransparent) || ai.PlayerLastSeen != null) {
+                    if (cellsToPlayer.Count() > 0 || cellsToPlayer.All(x => x.IsTransparent)) {
                         ai.PlayerLastSeen = playerEntity.Position;
+                    } 
 
+                    if (ai.PlayerLastSeen != null) {
                         var pathFinder = new RogueSharp.PathFinder(level.Map);
                         var path = pathFinder.ShortestPath(level.Map.GetCell(entity.X, entity.Y), level.Map.GetCell(ai.PlayerLastSeen.Value.X, ai.PlayerLastSeen.Value.Y));
-                        var cell = path.StepForward();
-                        
-                        to = new Point(cell.X, cell.Y);
+
+                        try {
+                            var cell = path.StepForward();
+                            to = new Point(cell.X, cell.Y);
+                        } catch (RogueSharp.NoMoreStepsException) { }
 
                         if (path.CurrentStep == path.End) {
                             ai.PlayerLastSeen = null;

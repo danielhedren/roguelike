@@ -17,7 +17,7 @@ namespace roguelike.Actors
             Components.Add(new EntityComponent(Color.White, Color.Transparent, '@'));
             Components.Add(new HealthComponent(100));
             Components.Add(new MovementComponent());
-            Components.Add(new MeleeAttackComponent(10));
+            Components.Add(new MeleeAttackComponent(10, 1));
         }
 
         public bool ProcessKeyboard(SadConsole.Input.Keyboard info, Level level)
@@ -63,11 +63,12 @@ namespace roguelike.Actors
 
                 var monsters = level.GetActors<Monster>();
                 Monster attacking = null;
+                EntityComponent attackingEntity = null;
 
                 foreach (var monster in monsters) {
-                    var mEntity = monster.Get<EntityComponent>();
+                    attackingEntity = monster.Get<EntityComponent>();
 
-                    if (mEntity.Position == currentPosition + movement) {
+                    if (attackingEntity.Position == currentPosition + movement) {
                         attacking = monster;
 
                         break;
@@ -79,7 +80,8 @@ namespace roguelike.Actors
 
                     EventBus.Publish(new BeforeMeleeAttackEvent {
                         Attacker = this,
-                        Target = attacking,
+                        IntendedTarget = attacking,
+                        TargetPoint = attackingEntity.Position,
                         Damage = attack.Damage,
                         ActivateIn = attack.Speed,
                         InterruptOnCancel = true

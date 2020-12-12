@@ -20,10 +20,18 @@ namespace roguelike.Handlers
             if (e.GetType() == typeof(BeforeMeleeAttackEvent)) {
                 var ev = (BeforeMeleeAttackEvent) e;
 
-                if (!Utils.Geometry.IsNextTo(ev.Attacker.Get<EntityComponent>().Position, ev.Target.Get<EntityComponent>().Position)) {
+                if (!level.Actors.Contains(ev.Attacker)) {
+                    if (ev.InterruptOnCancel) {
+                        EventBus.Publish(new InterruptEvent());
+                    }
+
+                    return;
+                }
+
+                if (ev.IntendedTarget.Get<EntityComponent>()?.Position != ev.TargetPoint) {
                     EventBus.Publish(new OnAttackEvadedEvent {
                         Attacker = ev.Attacker,
-                        Target = ev.Target,
+                        IntendedTarget = ev.IntendedTarget,
                         Damage = ev.Damage
                     });
 
@@ -36,7 +44,7 @@ namespace roguelike.Handlers
 
                 EventBus.Publish(new OnMeleeAttackEvent {
                     Attacker = ev.Attacker,
-                    Target = ev.Target,
+                    IntendedTarget = ev.IntendedTarget,
                     Damage = ev.Damage,
                     InterruptOnCancel = ev.InterruptOnCancel,
                     Interrupt = ev.Attacker == level.GetActors<Player>().First()
@@ -44,12 +52,12 @@ namespace roguelike.Handlers
             } else {
                 var ev = (OnMeleeAttackEvent) e;
 
-                var h = ev.Target.Get<HealthComponent>();
+                var h = ev.IntendedTarget.Get<HealthComponent>();
                 h.CurrentHealth -= ev.Damage;
 
                 EventBus.Publish(new OnDamageTakenEvent {
                     Attacker = ev.Attacker,
-                    Target = ev.Target,
+                    Target = ev.IntendedTarget,
                     Damage = ev.Damage
                 });
             }

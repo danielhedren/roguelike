@@ -15,7 +15,7 @@ namespace roguelike.Actors.Monsters
             var movementComponent = new MovementComponent();
             movementComponent.Speed = 0.8;
             Components.Add(movementComponent);
-            Components.Add(new MeleeAttackComponent(5));
+            Components.Add(new MeleeAttackComponent(5, 0.5));
             Components.Add(new NameComponent("Rat"));
             Components.Add(new SimpleAIComponent());
         }
