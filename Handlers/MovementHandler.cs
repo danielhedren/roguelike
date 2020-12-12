@@ -6,11 +6,11 @@ using roguelike.Components;
 using roguelike.Events;
 using roguelike.World;
 
-namespace roguelike.Systems
+namespace roguelike.Handlers
 {
-    public class MovementSystem : System
+    public class MovementHandler : Handler
     {
-        public MovementSystem()
+        public MovementHandler()
         {
             EventBus.Subscribe(typeof(BeforeMovementEvent), this);
             EventBus.Subscribe(typeof(OnMovementEvent), this);
@@ -55,49 +55,6 @@ namespace roguelike.Systems
 
                 var entity = ev.Actor.Get<EntityComponent>();
                 entity.Position = ev.To;
-            }
-        }
-
-        public override void Update(Level level)
-        {
-            return;
-
-            var actors = level.GetActors<Actor>().Where(x => x.Has<MovementComponent>() && x.Has<EntityComponent>());
-
-            foreach (var a in actors)
-            {
-                var movement = a.Get<MovementComponent>();
-                var entity = a.Get<EntityComponent>();
-
-                var previousPosition = entity.Position;
-                var newPosition = entity.Position + movement.Movement;
-
-                movement.Movement = Point.Zero;
-
-                if (!level.Map.IsWalkable(newPosition.X, newPosition.Y))
-                {
-                    newPosition = previousPosition;
-                } else {
-                    foreach (var a2 in actors)
-                    {
-                        if (a.Id == a2.Id) continue;
-
-                        if (a2.Get<EntityComponent>()?.Position == newPosition && a2.Get<HealthComponent>()?.CurrentHealth > 0)
-                        {
-                            newPosition = previousPosition;
-                            break;
-                        }
-                    }
-                }
-
-                if (newPosition != previousPosition) {
-                    EventBus.Publish(new OnMovementEvent {
-                        Actor = a,
-                        From = previousPosition,
-                        To = newPosition,
-                        ActivateIn = movement.Speed
-                    });
-                }
             }
         }
     }

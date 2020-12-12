@@ -5,9 +5,10 @@ namespace roguelike.Components
 {
     public class MeleeAttackComponent : Component
     {
-        public float Damage { get; set; } = 0;
+        public double Damage { get; set; } = 0;
+        public double Speed { get; set; } = 1;
 
-        public MeleeAttackComponent(float damage)
+        public MeleeAttackComponent(double damage)
         {
             Damage = damage;
         }

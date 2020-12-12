@@ -2,11 +2,11 @@ using roguelike.Events;
 using roguelike.Utils;
 using roguelike.World;
 
-namespace roguelike.Systems
+namespace roguelike.Handlers
 {
-    public class TurnSystem : System
+    public class TurnHandler : Handler
     {
-        public TurnSystem()
+        public TurnHandler()
         {
             EventBus.Subscribe(typeof(ActorTurnEvent), this);
         }
@@ -22,10 +22,6 @@ namespace roguelike.Systems
                     Interrupt = ev.Interrupt
                 });
             }
-        }
-
-        public override void Update(Level level)
-        {
         }
     }
 }

@@ -75,9 +75,15 @@ namespace roguelike.Actors
                 }
 
                 if (attacking != null) {
-                    Logging.Log("Player wanted to attack!");
+                    var attack = Get<MeleeAttackComponent>();
 
-                    EventBus.Publish(new InterruptEvent());
+                    EventBus.Publish(new BeforeMeleeAttackEvent {
+                        Attacker = this,
+                        Target = attacking,
+                        Damage = attack.Damage,
+                        ActivateIn = attack.Speed,
+                        InterruptOnCancel = true
+                    });
                 } else {
                     EventBus.Publish(new BeforeMovementEvent {
                         Actor = this,

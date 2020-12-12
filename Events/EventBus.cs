@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using roguelike.Handlers;
 using roguelike.World;
 
 namespace roguelike.Events
@@ -7,7 +8,7 @@ namespace roguelike.Events
     public class EventBus
     {
         public static List<Event> Events = new List<Event>();
-        private static Dictionary<System.Type, List<roguelike.Systems.System>> Subscribers = new Dictionary<System.Type, List<Systems.System>>();
+        private static Dictionary<System.Type, List<Handler>> Subscribers = new Dictionary<System.Type, List<Handler>>();
 
         public static bool HandleNext(Level level)
         {
@@ -39,17 +40,17 @@ namespace roguelike.Events
             return !interrupt;
         }
 
-        public static void Subscribe(System.Type type, roguelike.Systems.System system)
+        public static void Subscribe(System.Type type, Handler handler)
         {
             if (!type.IsSubclassOf(typeof(Event))) {
                 throw new System.Exception();
             }
 
             if (!Subscribers.ContainsKey(type)) {
-                Subscribers.Add(type, new List<Systems.System>());
+                Subscribers.Add(type, new List<Handler>());
             }
 
-            Subscribers[type].Add(system);
+            Subscribers[type].Add(handler);
         }
 
         public static void Publish(Event e)

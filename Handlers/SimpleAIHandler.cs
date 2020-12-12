@@ -6,11 +6,11 @@ using roguelike.Events;
 using roguelike.Utils;
 using roguelike.World;
 
-namespace roguelike.Systems
+namespace roguelike.Handlers
 {
-    public class SimpleAISystem : System
+    public class SimpleAIHandler : Handler
     {
-        public SimpleAISystem()
+        public SimpleAIHandler()
         {
             EventBus.Subscribe(typeof(ActorTurnEvent), this);
         }
@@ -30,8 +30,12 @@ namespace roguelike.Systems
 
                 if (entity != null && attack != null && level.Map.GetBorderCellsInSquare(entity.X, entity.Y, 1).Any(x => x.X == playerEntity.X && x.Y == playerEntity.Y))
                 {
-                    // Attack here
-                    Logging.Log("AI wanted to attack!");
+                    EventBus.Publish(new BeforeMeleeAttackEvent {
+                        Attacker = ev.Actor,
+                        Target = player,
+                        Damage = attack.Damage,
+                        ActivateIn = attack.Speed
+                    });
 
                     return;
                 }
@@ -71,11 +75,6 @@ namespace roguelike.Systems
                     });
                 }
             }
-        }
-
-        public override void Update(Level level)
-        {
-            
         }
     }
 }
