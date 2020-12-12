@@ -1,14 +1,17 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using roguelike.Handlers;
+using roguelike.Utils;
 using roguelike.World;
 
 namespace roguelike.Events
 {
     public class EventBus
     {
-        public static List<Event> Events = new List<Event>();
-        private static Dictionary<System.Type, List<IHandler>> Subscribers = new Dictionary<System.Type, List<IHandler>>();
+        public static List<Event> Events { get; set; } = new List<Event>();
+        private static Dictionary<System.Type, List<IHandler>> Subscribers { get; set; } = new Dictionary<System.Type, List<IHandler>>();
+        private static bool _interrupted { get; set; } = false;
 
         public static bool HandleNext(Level level)
         {
@@ -27,17 +30,29 @@ namespace roguelike.Events
                 }
             }
 
-            var tActivateIn = e.ActivateIn;
-            foreach (var e2 in Events)
-            {
-                e2.ActivateIn -= tActivateIn;
-            }
+            if (!_interrupted) {
+                var tActivateIn = e.ActivateIn;
+                foreach (var e2 in Events)
+                {
+                    e2.ActivateIn -= Math.Max(tActivateIn, 0);
+                }
 
-            var interrupt = e.Interrupt;
+                _interrupted = e.Interrupt;
+            }
 
             Events.Remove(e);
 
-            return !interrupt;
+            if (_interrupted) {
+                Events = Events.OrderBy(x => x.ActivateIn).ToList();
+                if (Events.First().ActivateIn <= 0) {
+                    return true;
+                } else {
+                    _interrupted = false;
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public static void Subscribe(System.Type type, IHandler handler)
