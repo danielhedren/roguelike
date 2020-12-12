@@ -52,6 +52,12 @@ namespace roguelike.Handlers
             } else {
                 var ev = (OnMeleeAttackEvent) e;
 
+                if (!level.Actors.Contains(ev.Attacker)) {
+                    ev.Cancel();
+                    
+                    return;
+                }
+
                 var h = ev.IntendedTarget.Get<HealthComponent>();
                 h.CurrentHealth -= ev.Damage;
 
