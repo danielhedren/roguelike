@@ -7,7 +7,7 @@ using roguelike.World;
 
 namespace roguelike.Handlers
 {
-    public class AttackHandler : Handler
+    public class AttackHandler : IHandler
     {
         public AttackHandler()
         {
@@ -15,7 +15,7 @@ namespace roguelike.Handlers
             EventBus.Subscribe(typeof(OnMeleeAttackEvent), this);
         }
 
-        public override void HandleEvent(Event e, Level level)
+        public void HandleEvent(Event e, Level level)
         {
             if (e.GetType() == typeof(BeforeMeleeAttackEvent)) {
                 var ev = (BeforeMeleeAttackEvent) e;

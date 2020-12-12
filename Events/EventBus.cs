@@ -8,7 +8,7 @@ namespace roguelike.Events
     public class EventBus
     {
         public static List<Event> Events = new List<Event>();
-        private static Dictionary<System.Type, List<Handler>> Subscribers = new Dictionary<System.Type, List<Handler>>();
+        private static Dictionary<System.Type, List<IHandler>> Subscribers = new Dictionary<System.Type, List<IHandler>>();
 
         public static bool HandleNext(Level level)
         {
@@ -40,14 +40,14 @@ namespace roguelike.Events
             return !interrupt;
         }
 
-        public static void Subscribe(System.Type type, Handler handler)
+        public static void Subscribe(System.Type type, IHandler handler)
         {
             if (!type.IsSubclassOf(typeof(Event))) {
                 throw new System.Exception();
             }
 
             if (!Subscribers.ContainsKey(type)) {
-                Subscribers.Add(type, new List<Handler>());
+                Subscribers.Add(type, new List<IHandler>());
             }
 
             Subscribers[type].Add(handler);

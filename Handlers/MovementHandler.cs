@@ -8,7 +8,7 @@ using roguelike.World;
 
 namespace roguelike.Handlers
 {
-    public class MovementHandler : Handler
+    public class MovementHandler : IHandler
     {
         public MovementHandler()
         {
@@ -16,7 +16,7 @@ namespace roguelike.Handlers
             EventBus.Subscribe(typeof(OnMovementEvent), this);
         }
         
-        public override void HandleEvent(Event e, Level level)
+        public void HandleEvent(Event e, Level level)
         {
             if (e.GetType() == typeof(BeforeMovementEvent))
             {

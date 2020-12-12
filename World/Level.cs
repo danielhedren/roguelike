@@ -12,7 +12,7 @@ namespace roguelike.World
     {
         public RogueSharp.Map Map { get; set; }
         public List<Actor> Actors { get; set; } = new List<Actor>();
-        public List<Handler> Handlers { get; set; } = new List<Handler>();
+        public List<IHandler> Handlers { get; set; } = new List<IHandler>();
 
         public Level(int width, int height)
         {

@@ -8,14 +8,14 @@ using roguelike.World;
 
 namespace roguelike.Handlers
 {
-    public class SimpleAIHandler : Handler
+    public class SimpleAIHandler : IHandler
     {
         public SimpleAIHandler()
         {
             EventBus.Subscribe(typeof(ActorTurnEvent), this);
         }
 
-        public override void HandleEvent(Event e, Level level)
+        public void HandleEvent(Event e, Level level)
         {
             var ev = (ActorTurnEvent) e;
 

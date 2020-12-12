@@ -4,7 +4,7 @@ using roguelike.World;
 
 namespace roguelike.Handlers
 {
-    public class MessageLoggingHandler : Handler
+    public class MessageLoggingHandler : IHandler
     {
         public MessageLoggingHandler()
         {
@@ -12,7 +12,7 @@ namespace roguelike.Handlers
             EventBus.Subscribe(typeof(OnAttackEvadedEvent), this);
         }
 
-        public override void HandleEvent(Event e, Level level)
+        public void HandleEvent(Event e, Level level)
         {
             if (e.GetType() == typeof(OnDamageTakenEvent))
             {

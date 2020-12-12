@@ -4,14 +4,14 @@ using roguelike.World;
 
 namespace roguelike.Handlers
 {
-    public class TurnHandler : Handler
+    public class TurnHandler : IHandler
     {
         public TurnHandler()
         {
             EventBus.Subscribe(typeof(ActorTurnEvent), this);
         }
 
-        public override void HandleEvent(Event e, Level level)
+        public void HandleEvent(Event e, Level level)
         {
             var ev = (ActorTurnEvent) e;
 
