@@ -35,11 +35,13 @@ namespace roguelike.Handlers
                     if (actor == ev.Actor) continue;
 
                     var entity = actor.Get<EntityComponent>();
+                    if (entity.IsWalkable) continue;
+
                     var health = actor.Get<HealthComponent>();
 
                     if (entity.Position == ev.To && (health == null || !health.IsDead)) {
                         ev.Cancel();
-                        
+
                         return;
                     }
                 }
