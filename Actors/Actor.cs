@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using roguelike.Components;
-using roguelike.World;
+using roguelike.Engine;
 using SadConsole.Entities;
 
 namespace roguelike.Actors

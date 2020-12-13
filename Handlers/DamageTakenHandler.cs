@@ -1,19 +1,19 @@
 using roguelike.Events;
 using roguelike.Utils;
-using roguelike.World;
+using roguelike.Engine;
 using roguelike.Actors;
 using roguelike.Components;
 
 namespace roguelike.Handlers
 {
-    public class DamageTakenHandler : IHandler
+    public class DamageTakenHandler : Handler
     {
-        public DamageTakenHandler()
+        public DamageTakenHandler(World world) : base(world)
         {
-            EventBus.Subscribe(typeof(OnDamageTakenEvent), this);
+            Subscribe(typeof(OnDamageTakenEvent));
         }
 
-        public void HandleEvent(Event e, Level level)
+        public override void HandleEvent(Event e)
         {
             var ev = (OnDamageTakenEvent) e;
 
@@ -30,10 +30,10 @@ namespace roguelike.Handlers
 
                 var corpse = new Corpse();
                 corpse.Get<EntityComponent>().Position = ev.Target.Get<EntityComponent>().Position;
-                level.Actors.Add(corpse);
+                _world.CurrentLevel.Actors.Add(corpse);
 
                 ev.Target.Components.Clear();
-                level.Actors.Remove(ev.Target);
+                _world.CurrentLevel.Actors.Remove(ev.Target);
             }
         }
     }

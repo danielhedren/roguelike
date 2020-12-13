@@ -7,12 +7,5 @@ namespace roguelike.Events
         public bool Interrupt { get; set; } = false;
         public bool InterruptOnCancel { get; set; } = false;
         public double ActivateIn { get; set; } = 0;
-
-        public void Cancel()
-        {
-            if (InterruptOnCancel) {
-                EventBus.Publish(new InterruptEvent());
-            }
-        }
     }
 }

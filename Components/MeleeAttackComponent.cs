@@ -1,6 +1,3 @@
-using roguelike.Actors;
-using roguelike.World;
-
 namespace roguelike.Components
 {
     public class MeleeAttackComponent : Component

@@ -1,17 +1,17 @@
 using roguelike.Events;
 using roguelike.Utils;
-using roguelike.World;
+using roguelike.Engine;
 
 namespace roguelike.Handlers
 {
-    public class MessageLoggingHandler : IHandler
+    public class MessageLoggingHandler : Handler
     {
-        public MessageLoggingHandler()
+        public MessageLoggingHandler(World world) : base(world)
         {
-            EventBus.Subscribe(typeof(OnAttackEvadedEvent), this);
+            Subscribe(typeof(OnAttackEvadedEvent));
         }
 
-        public void HandleEvent(Event e, Level level)
+        public override void HandleEvent(Event e)
         {
             if (e.GetType() == typeof(OnAttackEvadedEvent)) {
                 var ev = (OnAttackEvadedEvent) e;

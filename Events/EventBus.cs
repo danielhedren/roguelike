@@ -3,17 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using roguelike.Handlers;
 using roguelike.Utils;
-using roguelike.World;
+using roguelike.Engine;
 
 namespace roguelike.Events
 {
     public class EventBus
     {
-        public static List<Event> Events { get; set; } = new List<Event>();
-        private static Dictionary<System.Type, List<IHandler>> Subscribers { get; set; } = new Dictionary<System.Type, List<IHandler>>();
-        private static bool _interrupted { get; set; } = false;
+        public List<Event> Events { get; set; } = new List<Event>();
+        private Dictionary<System.Type, List<Handler>> Subscribers { get; set; } = new Dictionary<System.Type, List<Handler>>();
+        private List<Handler> Handlers { get; set; } = new List<Handler>();
+        private bool _interrupted { get; set; } = false;
+        private World _world { get; set; }
 
-        public static bool HandleNext(Level level)
+        public EventBus(World world)
+        {
+            _world = world;
+        }
+
+        public bool HandleNext()
         {
             if (Events.Count == 0) return false;
 
@@ -24,7 +31,7 @@ namespace roguelike.Events
             {
                 foreach (var sub in Subscribers[e.GetType()])
                 {
-                    sub.HandleEvent(e, level);
+                    sub.HandleEvent(e);
 
                     if (e.StopPropagation) break;
                 }
@@ -44,7 +51,7 @@ namespace roguelike.Events
 
             if (_interrupted) {
                 Events = Events.OrderBy(x => x.ActivateIn).ToList();
-                if (Events.First().ActivateIn <= 0) {
+                if (Events.Count() > 0 && Events.First().ActivateIn <= 0) {
                     return true;
                 } else {
                     _interrupted = false;
@@ -55,22 +62,34 @@ namespace roguelike.Events
             return true;
         }
 
-        public static void Subscribe(System.Type type, IHandler handler)
+        public void Subscribe(System.Type type, Handler handler)
         {
             if (!type.IsSubclassOf(typeof(Event))) {
                 throw new System.Exception();
             }
 
             if (!Subscribers.ContainsKey(type)) {
-                Subscribers.Add(type, new List<IHandler>());
+                Subscribers.Add(type, new List<Handler>());
             }
 
             Subscribers[type].Add(handler);
         }
 
-        public static void Publish(Event e)
+        public void Publish(Event e)
         {
-            EventBus.Events.Add(e);
+            Events.Add(e);
+        }
+
+        public void Cancel(Event e)
+        {
+            if (e.InterruptOnCancel) {
+                Publish(new InterruptEvent());
+            }
+        }
+
+        public void RegisterHandler<T>() where T : Handler
+        {
+            Handlers.Add((Handler) Activator.CreateInstance(typeof(T), new object[] { _world }));
         }
     }
 }

@@ -1,6 +1,4 @@
 using Microsoft.Xna.Framework;
-using roguelike.Actors;
-using roguelike.World;
 
 namespace roguelike.Components
 {

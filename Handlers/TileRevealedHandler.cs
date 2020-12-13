@@ -3,22 +3,22 @@ using System.Linq;
 using roguelike.Actors;
 using roguelike.Components;
 using roguelike.Events;
-using roguelike.World;
+using roguelike.Engine;
 
 namespace roguelike.Handlers
 {
-    public class TileRevealedHandler : IHandler
+    public class TileRevealedHandler : Handler
     {
-        public TileRevealedHandler()
+        public TileRevealedHandler(World world) : base(world)
         {
-            EventBus.Subscribe(typeof(OnTileRevealedEvent), this);
+            Subscribe(typeof(OnTileRevealedEvent));
         }
 
-        public void HandleEvent(Event e, Level level)
+        public override void HandleEvent(Event e)
         {
             var ev = (OnTileRevealedEvent) e;
 
-            var health = level.GetActors<Player>().First().Get<HealthComponent>();
+            var health = _world.CurrentLevel.GetActors<Player>().First().Get<HealthComponent>();
             health.CurrentHealth = Math.Min(health.CurrentHealth + 0.5, health.MaxHealth);
         }
     }

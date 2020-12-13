@@ -4,31 +4,31 @@ using Microsoft.Xna.Framework;
 using roguelike.Actors;
 using roguelike.Components;
 using roguelike.Events;
-using roguelike.World;
+using roguelike.Engine;
 
 namespace roguelike.Handlers
 {
-    public class MovementHandler : IHandler
+    public class MovementHandler : Handler
     {
-        public MovementHandler()
+        public MovementHandler(World world) : base(world)
         {
-            EventBus.Subscribe(typeof(BeforeMovementEvent), this);
-            EventBus.Subscribe(typeof(OnMovementEvent), this);
+            Subscribe(typeof(BeforeMovementEvent));
+            Subscribe(typeof(OnMovementEvent));
         }
         
-        public void HandleEvent(Event e, Level level)
+        public override void HandleEvent(Event e)
         {
             if (e.GetType() == typeof(BeforeMovementEvent))
             {
                 var ev = (BeforeMovementEvent) e;
 
-                if (!level.Map.IsWalkable(ev.To.X, ev.To.Y)) {
-                    ev.Cancel();
+                if (!_world.CurrentLevel.Map.IsWalkable(ev.To.X, ev.To.Y)) {
+                    _world.EventBus.Cancel(e);
                     
                     return;
                 }
 
-                var actors = level.GetActors<Actor>().Where(x => x.Has<EntityComponent>());
+                var actors = _world.CurrentLevel.GetActors<Actor>().Where(x => x.Has<EntityComponent>());
 
                 foreach (var actor in actors)
                 {
@@ -40,24 +40,24 @@ namespace roguelike.Handlers
                     var health = actor.Get<HealthComponent>();
 
                     if (entity.Position == ev.To && (health == null || !health.IsDead)) {
-                        ev.Cancel();
+                        _world.EventBus.Cancel(e);
 
                         return;
                     }
                 }
 
-                EventBus.Publish(new OnMovementEvent {
+                _world.EventBus.Publish(new OnMovementEvent {
                     Actor = ev.Actor,
                     From = ev.From,
                     To = ev.To,
-                    Interrupt = ev.Actor == level.GetActors<Player>().First()
+                    Interrupt = ev.Actor == _world.CurrentLevel.GetActors<Player>().First()
                 });
             } else if (e.GetType() == typeof(OnMovementEvent))
             {
                 var ev = (OnMovementEvent) e;
 
-                if (!level.Actors.Contains(ev.Actor)) {
-                    ev.Cancel();
+                if (!_world.CurrentLevel.Actors.Contains(ev.Actor)) {
+                    _world.EventBus.Cancel(e);
 
                     return;
                 }

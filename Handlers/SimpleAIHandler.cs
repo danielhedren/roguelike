@@ -4,23 +4,25 @@ using roguelike.Actors;
 using roguelike.Components;
 using roguelike.Events;
 using roguelike.Utils;
-using roguelike.World;
+using roguelike.Engine;
 
 namespace roguelike.Handlers
 {
-    public class SimpleAIHandler : IHandler
+    public class SimpleAIHandler : Handler
     {
-        public SimpleAIHandler()
+        public SimpleAIHandler(World world) : base(world)
         {
-            EventBus.Subscribe(typeof(ActorTurnEvent), this);
+            Subscribe(typeof(ActorTurnEvent));
         }
 
-        public void HandleEvent(Event e, Level level)
+        public override void HandleEvent(Event e)
         {
             var ev = (ActorTurnEvent) e;
 
             if (ev.Actor.Has<SimpleAIComponent>())
             {
+                var level = _world.CurrentLevel;
+
                 var player = level.GetActors<Player>().First();
                 var playerEntity = player.Get<EntityComponent>();
                 var entity = ev.Actor.Get<EntityComponent>();
@@ -30,7 +32,7 @@ namespace roguelike.Handlers
 
                 if (entity != null && attack != null && Geometry.IsNextTo(entity.Position, playerEntity.Position))
                 {
-                    EventBus.Publish(new BeforeMeleeAttackEvent {
+                    _world.EventBus.Publish(new BeforeMeleeAttackEvent {
                         Attacker = ev.Actor,
                         IntendedTarget = player,
                         TargetPoint = playerEntity.Entity.Position,
@@ -51,30 +53,34 @@ namespace roguelike.Handlers
 
                     if (ai.PlayerLastSeen != null) {
                         var pathFinder = new RogueSharp.PathFinder(level.Map);
-                        var path = pathFinder.ShortestPath(level.Map.GetCell(entity.X, entity.Y), level.Map.GetCell(ai.PlayerLastSeen.Value.X, ai.PlayerLastSeen.Value.Y));
-
                         try {
+                            var path = pathFinder.ShortestPath(level.Map.GetCell(entity.X, entity.Y), level.Map.GetCell(ai.PlayerLastSeen.Value.X, ai.PlayerLastSeen.Value.Y));
                             var cell = path.StepForward();
-                            to = new Point(cell.X, cell.Y);
-                        } catch (RogueSharp.NoMoreStepsException) { }
 
-                        if (path.CurrentStep == path.End) {
+                            to = new Point(cell.X, cell.Y);
+
+                            if (path.CurrentStep == path.End) {
+                                ai.PlayerLastSeen = null;
+                            }
+                        } catch (System.Exception ex) {
                             ai.PlayerLastSeen = null;
                         }
-                    } else {
+                    }
+
+                    if (ai.PlayerLastSeen == null) {
                         to = entity.Entity.Position + new Point(Random.Next(-1, 2), Random.Next(-1, 2));
                     }
                     
                     ev.Handled = true;
 
-                    EventBus.Publish(new BeforeMovementEvent {
+                    _world.EventBus.Publish(new BeforeMovementEvent {
                         Actor = ev.Actor,
                         From = entity.Entity.Position,
                         To = to,
                         ActivateIn = movement.Speed
                     });
 
-                    EventBus.Publish(new ActorTurnEvent {
+                    _world.EventBus.Publish(new ActorTurnEvent {
                         Actor = ev.Actor,
                         ActivateIn = movement.Speed
                     });

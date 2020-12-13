@@ -6,25 +6,18 @@ using roguelike.Components;
 using roguelike.Events;
 using roguelike.Handlers;
 
-namespace roguelike.World
+namespace roguelike.Engine
 {
-    public class Level
+    public abstract class Level
     {
         public RogueSharp.Map Map { get; set; }
         public List<Actor> Actors { get; set; } = new List<Actor>();
-        public List<IHandler> Handlers { get; set; } = new List<IHandler>();
+        protected World _world;
 
-        public Level(int width, int height)
+        public Level(World world, int width, int height)
         {
+            _world = world;
             Map = RogueSharp.Map.Create(new RogueSharp.MapCreation.CaveMapCreationStrategy<RogueSharp.Map>(width, height, 45, 2, 3));
-            Handlers.Add(new MovementHandler());
-            Handlers.Add(new SimpleAIHandler());
-            Handlers.Add(new AttackHandler());
-            Handlers.Add(new MessageLoggingHandler());
-            Handlers.Add(new DamageTakenHandler());
-            Handlers.Add(new TileRevealedHandler());
-
-            Handlers.Add(new TurnHandler());
         }
 
         public List<T> GetActors<T>() where T : Actor
@@ -47,12 +40,6 @@ namespace roguelike.World
             return components;
         }
 
-        public void Update()
-        {
-            while (EventBus.HandleNext(this))
-            {
-
-            }
-        }
+        public abstract void Initialize();
     }
 }

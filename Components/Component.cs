@@ -1,6 +1,6 @@
 using System;
 using roguelike.Actors;
-using roguelike.World;
+using roguelike.Engine;
 
 namespace roguelike.Components
 {

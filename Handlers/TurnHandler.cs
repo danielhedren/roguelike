@@ -1,22 +1,22 @@
 using roguelike.Events;
 using roguelike.Utils;
-using roguelike.World;
+using roguelike.Engine;
 
 namespace roguelike.Handlers
 {
-    public class TurnHandler : IHandler
+    public class TurnHandler : Handler
     {
-        public TurnHandler()
+        public TurnHandler(World world) : base(world)
         {
-            EventBus.Subscribe(typeof(ActorTurnEvent), this);
+            Subscribe(typeof(ActorTurnEvent));
         }
 
-        public void HandleEvent(Event e, Level level)
+        public override void HandleEvent(Event e)
         {
             var ev = (ActorTurnEvent) e;
 
             if (!ev.Handled) {
-                EventBus.Publish(new ActorTurnEvent {
+                _world.EventBus.Publish(new ActorTurnEvent {
                     Actor = ev.Actor,
                     ActivateIn = 1,
                     Interrupt = ev.Interrupt

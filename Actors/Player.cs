@@ -1,3 +1,4 @@
+using System.Linq;
 using System.ComponentModel;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -5,7 +6,7 @@ using roguelike.Actors.Monsters;
 using roguelike.Components;
 using roguelike.Events;
 using roguelike.Utils;
-using roguelike.World;
+using roguelike.Engine;
 using SadConsole;
 
 namespace roguelike.Actors
@@ -20,7 +21,7 @@ namespace roguelike.Actors
             Components.Add(new MeleeAttackComponent(10, 1));
         }
 
-        public bool ProcessKeyboard(SadConsole.Input.Keyboard info, Level level)
+        public bool ProcessKeyboard(SadConsole.Input.Keyboard info, World world)
         {
             var movement = Point.Zero;
             var handled = false;
@@ -50,18 +51,27 @@ namespace roguelike.Actors
             }
 
             if (info.IsKeyPressed(Keys.NumPad5)) {
-                EventBus.Publish(new InterruptEvent {
+                world.EventBus.Publish(new InterruptEvent {
                     ActivateIn = 1
                 });
 
                 handled = true;
             }
 
+            if (info.IsKeyPressed(Keys.Space)) {
+                var stairs = world.CurrentLevel.GetActors<Stairs>().First().Get<EntityComponent>();
+
+                if (stairs.Position == Get<EntityComponent>().Position) {
+                    world.DestroyLevel();
+                    world.CreateLevel();
+                }   
+            }
+
             if (movement != Point.Zero) {
                 var currentPosition = Get<EntityComponent>().Position;
                 var entity = Get<EntityComponent>();
 
-                var monsters = level.GetActors<Monster>();
+                var monsters = world.CurrentLevel.GetActors<Monster>();
                 Monster attacking = null;
                 EntityComponent attackingEntity = null;
 
@@ -78,7 +88,7 @@ namespace roguelike.Actors
                 if (attacking != null) {
                     var attack = Get<MeleeAttackComponent>();
 
-                    EventBus.Publish(new BeforeMeleeAttackEvent {
+                    world.EventBus.Publish(new BeforeMeleeAttackEvent {
                         Attacker = this,
                         IntendedTarget = attacking,
                         TargetPoint = attackingEntity.Position,
@@ -87,7 +97,7 @@ namespace roguelike.Actors
                         InterruptOnCancel = true
                     });
                 } else {
-                    EventBus.Publish(new BeforeMovementEvent {
+                    world.EventBus.Publish(new BeforeMovementEvent {
                         Actor = this,
                         From = currentPosition,
                         To = currentPosition + movement,

@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using roguelike.Consoles;
+using roguelike.Engine;
 using Console = SadConsole.Console;
 
 namespace roguelike
@@ -24,11 +25,15 @@ namespace roguelike
 
         static void Init()
         {
-            SadConsole.Global.CurrentScreen = new MapConsole();
+            var world = new World();
+            world.CreateLevel();
+
+            var console = new MapConsole();
+            console.World = world;
+            SadConsole.Global.CurrentScreen = console;
             SadConsole.Global.CurrentScreen.IsFocused = true;
         }
-
-        static void Update(GameTime gameTime)
+         static void Update(GameTime gameTime)
         {
 
         }

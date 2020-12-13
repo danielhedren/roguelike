@@ -3,57 +3,55 @@ using roguelike.Actors;
 using roguelike.Components;
 using roguelike.Events;
 using roguelike.Utils;
-using roguelike.World;
+using roguelike.Engine;
 
 namespace roguelike.Handlers
 {
-    public class AttackHandler : IHandler
+    public class AttackHandler : Handler
     {
-        public AttackHandler()
+        public AttackHandler(World world) : base(world)
         {
-            EventBus.Subscribe(typeof(BeforeMeleeAttackEvent), this);
-            EventBus.Subscribe(typeof(OnMeleeAttackEvent), this);
+            Subscribe(typeof(BeforeMeleeAttackEvent));
+            Subscribe(typeof(OnMeleeAttackEvent));
         }
 
-        public void HandleEvent(Event e, Level level)
+        public override void HandleEvent(Event e)
         {
             if (e.GetType() == typeof(BeforeMeleeAttackEvent)) {
                 var ev = (BeforeMeleeAttackEvent) e;
 
-                if (!level.Actors.Contains(ev.Attacker)) {
-                    if (ev.InterruptOnCancel) {
-                        EventBus.Publish(new InterruptEvent());
-                    }
+                if (!_world.CurrentLevel.Actors.Contains(ev.Attacker)) {
+                    _world.EventBus.Cancel(e);
 
                     return;
                 }
 
                 if (ev.IntendedTarget.Get<EntityComponent>()?.Position != ev.TargetPoint) {
-                    EventBus.Publish(new OnAttackEvadedEvent {
+                    _world.EventBus.Publish(new OnAttackEvadedEvent {
                         Attacker = ev.Attacker,
                         IntendedTarget = ev.IntendedTarget,
                         Damage = ev.Damage
                     });
 
                     if (ev.InterruptOnCancel) {
-                        EventBus.Publish(new InterruptEvent());
+                        _world.EventBus.Publish(new InterruptEvent());
                     }
 
                     return;
                 }
 
-                EventBus.Publish(new OnMeleeAttackEvent {
+                _world.EventBus.Publish(new OnMeleeAttackEvent {
                     Attacker = ev.Attacker,
                     IntendedTarget = ev.IntendedTarget,
                     Damage = ev.Damage,
                     InterruptOnCancel = ev.InterruptOnCancel,
-                    Interrupt = ev.Attacker == level.GetActors<Player>().First()
+                    Interrupt = ev.Attacker == _world.CurrentLevel.GetActors<Player>().First()
                 });
             } else {
                 var ev = (OnMeleeAttackEvent) e;
 
-                if (!level.Actors.Contains(ev.Attacker)) {
-                    ev.Cancel();
+                if (!_world.CurrentLevel.Actors.Contains(ev.Attacker)) {
+                    _world.EventBus.Cancel(e);
                     
                     return;
                 }
@@ -61,7 +59,7 @@ namespace roguelike.Handlers
                 var h = ev.IntendedTarget.Get<HealthComponent>();
                 h.CurrentHealth -= ev.Damage;
 
-                EventBus.Publish(new OnDamageTakenEvent {
+                _world.EventBus.Publish(new OnDamageTakenEvent {
                     Attacker = ev.Attacker,
                     Target = ev.IntendedTarget,
                     Damage = ev.Damage
