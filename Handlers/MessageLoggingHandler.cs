@@ -9,6 +9,7 @@ namespace roguelike.Handlers
         public MessageLoggingHandler(World world) : base(world)
         {
             Subscribe(typeof(OnAttackEvadedEvent));
+            Subscribe(typeof(OnAttackRollFailedEvent));
         }
 
         public override void HandleEvent(Event e)
@@ -16,7 +17,11 @@ namespace roguelike.Handlers
             if (e.GetType() == typeof(OnAttackEvadedEvent)) {
                 var ev = (OnAttackEvadedEvent) e;
 
-                Logging.Log($"{ev.GetType()}: {ev.IntendedTarget.GetType()} evaded {ev.Attacker.GetType()}s attack!");
+                Logging.Log($"{ev.GetType()}: {ev.IntendedTarget.GetType()} moved out of the way of {ev.Attacker.GetType()}s attack!");
+            } else if (e.GetType() == typeof(OnAttackRollFailedEvent)) {
+                var ev = (OnAttackRollFailedEvent) e;
+
+                Logging.Log($"{ev.GetType()}: {ev.Attacker.GetType()} missed {ev.IntendedTarget.GetType()}! ({ev.Roll} / {ev.Required})");
             }
         }
     }

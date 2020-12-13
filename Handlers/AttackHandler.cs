@@ -4,6 +4,7 @@ using roguelike.Components;
 using roguelike.Events;
 using roguelike.Utils;
 using roguelike.Engine;
+using roguelike.Actors.Monsters;
 
 namespace roguelike.Handlers
 {
@@ -31,6 +32,31 @@ namespace roguelike.Handlers
                         Attacker = ev.Attacker,
                         IntendedTarget = ev.IntendedTarget,
                         Damage = ev.Damage
+                    });
+
+                    if (ev.InterruptOnCancel) {
+                        _world.EventBus.Publish(new InterruptEvent());
+                    }
+
+                    return;
+                }
+
+                var targetAC = ev.IntendedTarget.Get<StatsComponent>()?.ArmorClass ?? 0;
+                var attackModifier = 0;
+
+                if (ev.Attacker.GetType().IsSubclassOf(typeof(Monster))) {
+                    attackModifier = ev.Attacker.Get<MeleeAttackComponent>()?.ToHit ?? 0;
+                } else {
+                    attackModifier = ev.Attacker.Get<StatsComponent>()?.StrengthModifier ?? 0;
+                }
+
+                var diceRoll = Random.Dice(1, 20, attackModifier);
+                if (diceRoll == 1 || (diceRoll != 20 && diceRoll < targetAC)) {
+                    _world.EventBus.Publish(new OnAttackRollFailedEvent {
+                        Attacker = ev.Attacker,
+                        IntendedTarget = ev.IntendedTarget,
+                        Roll = diceRoll,
+                        Required = targetAC
                     });
 
                     if (ev.InterruptOnCancel) {
