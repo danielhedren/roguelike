@@ -20,6 +20,9 @@ namespace roguelike.Engine
                 Actors.Add(new Rat());
             }
 
+            Actors.Add(new GiantFireBeetle());
+            Actors.Add(new GiantFireBeetle());
+
             Actors.Add(new Stairs());
 
             var rand = new System.Random();
