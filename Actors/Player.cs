@@ -16,9 +16,19 @@ namespace roguelike.Actors
         public Player()
         {
             Components.Add(new EntityComponent(Color.White, Color.Transparent, '@'));
-            Components.Add(new HealthComponent(100));
+            Components.Add(new HealthComponent(10));
             Components.Add(new MovementComponent());
-            Components.Add(new MeleeAttackComponent(10, 1));
+            Components.Add(new MeleeAttackComponent(1, 6, 0, 0, 1));
+            Components.Add(new StatsComponent {
+                Strength = 15,
+                Dexterity = 14,
+                Constitution = 13,
+                Intelligence = 12,
+                Wisdom = 10,
+                Charisma = 8,
+                HitDice = 10,
+                ArmorClass = 10
+            });
         }
 
         public bool ProcessKeyboard(SadConsole.Input.Keyboard info, World world)
