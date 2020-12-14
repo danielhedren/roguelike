@@ -7,6 +7,7 @@ using roguelike.Components;
 using roguelike.Actors.Monsters;
 using roguelike.Events;
 using roguelike.Engine;
+using ImageMagick;
 
 namespace roguelike.Consoles
 {
@@ -15,6 +16,9 @@ namespace roguelike.Consoles
         public Console Console { get; }
         public Console UIConsole { get; }
         public World World { get; set; }
+
+        private MagickImageCollection _frames;
+        private bool _record = false;
 
         public MapConsole()
         {
@@ -112,13 +116,42 @@ namespace roguelike.Consoles
 
         public override bool ProcessKeyboard(SadConsole.Input.Keyboard info)
         {
+            if (info.IsKeyPressed(Keys.R)) {
+                if (!_record) {
+                    _record = true;
+
+                    _frames = new MagickImageCollection();
+                } else {
+                    _record = false;
+                    _frames.First().AnimationIterations = 0;
+
+                    _frames.Optimize();
+
+                    System.IO.Directory.CreateDirectory("recordings");
+                    _frames.Write($"recordings/recording_{System.DateTime.Now.ToFileTime()}.gif");
+                }
+            }
+            
             if (World.CurrentLevel != null) {
                 var player = World.CurrentLevel.GetActors<Player>().FirstOrDefault();
 
                 if (player != null) {
                     var handledInput = player.ProcessKeyboard(info, World);
 
-                    if (handledInput) World.Update();
+                    if (handledInput) {
+                        if (_record)
+                        {
+                            using (var stream = new System.IO.MemoryStream())
+                            {
+                                SadConsole.Global.RenderOutput.SaveAsPng(stream, SadConsole.Global.RenderWidth, SadConsole.Global.RenderHeight);
+                                stream.Seek(0, 0);
+                                _frames.Add(new MagickImage(stream));
+                                _frames.Last().AnimationDelay = 10;
+                            }
+                        }
+
+                        World.Update();
+                    }
                 }
             }
 

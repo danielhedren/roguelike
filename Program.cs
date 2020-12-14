@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.Xna.Framework;
 using roguelike.Consoles;
 using roguelike.Engine;
@@ -33,7 +34,7 @@ namespace roguelike
             SadConsole.Global.CurrentScreen = console;
             SadConsole.Global.CurrentScreen.IsFocused = true;
         }
-         static void Update(GameTime gameTime)
+        static void Update(GameTime gameTime)
         {
 
         }
