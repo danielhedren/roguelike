@@ -29,6 +29,7 @@ namespace roguelike.Actors
                 HitDice = 10,
                 ArmorClass = 10
             });
+            Components.Add(new ExperienceComponent());
         }
 
         public bool ProcessKeyboard(SadConsole.Input.Keyboard info, World world)

@@ -29,7 +29,8 @@ namespace roguelike.Actors.Monsters
                 Wisdom = 10,
                 Charisma = 4,
                 HitDice = 4,
-                ArmorClass = 10
+                ArmorClass = 10,
+                ExperienceGained = 10
             });
             Components.Add(new NameComponent("Rat"));
             Components.Add(new SimpleAIComponent());

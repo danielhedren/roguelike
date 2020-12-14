@@ -28,7 +28,8 @@ namespace roguelike.Actors.Monsters
                 Wisdom = 7,
                 Charisma = 3,
                 HitDice = 6,
-                ArmorClass = 13
+                ArmorClass = 13,
+                ExperienceGained = 10
             });
             Components.Add(new NameComponent("Giant Fire Beetle"));
             Components.Add(new SimpleAIComponent());

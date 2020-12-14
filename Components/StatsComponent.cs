@@ -16,5 +16,6 @@ namespace roguelike.Components
         public int CharismaModifier { get => (Charisma - 10) / 2; }
         public int HitDice { get; set; }
         public int ArmorClass { get; set; }
+        public int ExperienceGained { get; set; }
     }
 }

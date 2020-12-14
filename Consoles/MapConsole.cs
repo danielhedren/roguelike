@@ -83,13 +83,20 @@ namespace roguelike.Consoles
         {
             UIConsole.Clear();
             UIConsole.Print(0, 0, "Playername");
-            UIConsole.Print(0, 2, $"{"Str: 0", -10}{"Agi: 0",-10}");
 
             var player = World.CurrentLevel.GetActors<Player>().First();
+            var stats = player.Get<StatsComponent>();
+            var experience = player.Get<ExperienceComponent>();
+
+            UIConsole.Print(0, 2, $"{"Str: " + stats.Strength, -10}{"Dex: " + stats.Dexterity,-10}");
+            UIConsole.Print(0, 3, $"{"Con: " + stats.Constitution, -10}{"Int: " + stats.Intelligence,-10}");
+
             var health = player.Get<HealthComponent>();
 
-            UIConsole.Print(0, 4, $"Health: {health.CurrentHealth}/{health.MaxHealth}");
-            UIConsole.Print(0, 5, $"Dungeon level: {World.CurrentLevelNumber}");
+            UIConsole.Print(0, 4, $"HP: {health.CurrentHealth}/{health.MaxHealth}");
+            UIConsole.Print(0, 5, $"{"XP: " + experience.Experience, -10}{"Lvl: " + experience.Level,-10}");
+
+            UIConsole.Print(0, 7, $"Dungeon level: {World.CurrentLevelNumber}");
 
             var monsters = World.CurrentLevel.GetActors<Monster>().Where(m => {
                 var e = m.Get<EntityComponent>();

@@ -17,11 +17,11 @@ namespace roguelike.Handlers
             if (e.GetType() == typeof(OnAttackEvadedEvent)) {
                 var ev = (OnAttackEvadedEvent) e;
 
-                Logging.Log($"{ev.GetType()}: {ev.IntendedTarget.GetType()} moved out of the way of {ev.Attacker.GetType()}s attack!");
+                Logging.Log($"{ev.GetType().Name}: {ev.IntendedTarget.GetType().Name} moved out of the way of {ev.Attacker.GetType().Name}s attack!");
             } else if (e.GetType() == typeof(OnAttackRollFailedEvent)) {
                 var ev = (OnAttackRollFailedEvent) e;
 
-                Logging.Log($"{ev.GetType()}: {ev.Attacker.GetType()} missed {ev.IntendedTarget.GetType()}! ({ev.Roll} / {ev.Required})");
+                Logging.Log($"{ev.GetType().Name}: {ev.Attacker.GetType().Name} missed {ev.IntendedTarget.GetType().Name}! ({ev.Roll} / {ev.Required})");
             }
         }
     }
