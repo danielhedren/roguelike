@@ -10,7 +10,7 @@ namespace roguelike
     public static class Program
     {
         public const int Width = 100;
-        public const int Height = 40;
+        public const int Height = 45;
 
         [STAThread]
         static void Main()

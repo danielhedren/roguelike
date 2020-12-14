@@ -19,27 +19,11 @@ namespace roguelike.Handlers
 
             var health = ev.Target.Get<HealthComponent>();
 
-            Logging.Log($"{ev.GetType().Name}: {ev.Attacker.GetType().Name} damaged {ev.Target.GetType().Name} for {ev.Damage} damage!");
-
             if (health.IsDead) {
-                Logging.Log($"{ev.GetType().Name}: {ev.Target.GetType().Name} died!");
-
-                if (ev.Target.GetType() == typeof(Player)) {
-                    Logging.Log($"You died!");
-                }
-
-                var experience = ev.Attacker.Get<ExperienceComponent>();
-                if (experience != null) {
-                    var xpGain = ev.Target.Get<StatsComponent>()?.ExperienceGained ?? 0;
-                    experience.Experience += xpGain;
-                }
-
-                var corpse = new Corpse();
-                corpse.Get<EntityComponent>().Position = ev.Target.Get<EntityComponent>().Position;
-                _world.CurrentLevel.Actors.Add(corpse);
-
-                ev.Target.Components.Clear();
-                _world.CurrentLevel.Actors.Remove(ev.Target);
+                _world.EventBus.Publish(new OnDeathEvent {
+                    Attacker = ev.Attacker,
+                    Target = ev.Target
+                });
             }
         }
     }

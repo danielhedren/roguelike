@@ -15,6 +15,7 @@ namespace roguelike.Consoles
     {
         public Console Console { get; }
         public Console UIConsole { get; }
+        public Console MessageConsole { get; }
         public World World { get; set; }
 
         private MagickImageCollection _frames;
@@ -27,10 +28,11 @@ namespace roguelike.Consoles
 
             UIConsole = new Console(18, Program.Height - 2);
             UIConsole.Parent = this;
-            var color = Color.Gray;
-            color.A = 127;
-            UIConsole.Fill(null, color, null);
             UIConsole.Position = new Point(Program.Width - 19, 1);
+
+            MessageConsole = new Console(Program.Width, 5);
+            MessageConsole.Parent = this;
+            MessageConsole.Position = new Point(0, Program.Height - 5);
         }
 
         public void Draw()
@@ -99,6 +101,7 @@ namespace roguelike.Consoles
 
             UIConsole.Print(0, 4, $"HP: {health.CurrentHealth}/{health.MaxHealth}");
             UIConsole.Print(0, 5, $"{"XP: " + experience.Experience, -10}{"Lvl: " + experience.Level,-10}");
+            UIConsole.Print(0, 6, $"{"Nxt lvl: " + experience.ExperienceToNextLevel, -10}");
 
             UIConsole.Print(0, 7, $"Dungeon level: {World.CurrentLevelNumber}");
 
@@ -111,6 +114,13 @@ namespace roguelike.Consoles
                 var monster = monsters[i];
                 var mHealth = monster.Get<HealthComponent>();
                 UIConsole.Print(0, 11 + i, $"{monster.Get<NameComponent>()?.Name} {mHealth.CurrentHealth}/{mHealth.MaxHealth}");
+            }
+
+            MessageConsole.Clear();
+            var line = 0;
+            var count = World.MessageLog.Count();
+            foreach (var message in World.MessageLog.TakeLast(5).Reverse()) {
+                MessageConsole.Print(0, line++, $"#{count--} {message.Message}", message.Color);
             }
         }
 

@@ -9,11 +9,18 @@ using roguelike.Handlers;
 
 namespace roguelike.Engine
 {
+    public struct MessageLogMessage
+    {
+        public string Message { get; set; }
+        public Color Color { get; set; }
+    }
+
     public class World
     {
         public Level CurrentLevel { get; set; }
         public int CurrentLevelNumber { get; set; } = 0;
         public SadConsole.Console Console { get; set; }
+        public List<MessageLogMessage> MessageLog { get; set; } = new List<MessageLogMessage>();
         public List<Handler> Handlers { get; set; } = new List<Handler>();
         public EventBus EventBus { get; set; }
         private Player _player { get; set; } = new Player();
@@ -28,6 +35,8 @@ namespace roguelike.Engine
             EventBus.RegisterHandler<MessageLoggingHandler>();
             EventBus.RegisterHandler<DamageTakenHandler>();
             EventBus.RegisterHandler<TileRevealedHandler>();
+            EventBus.RegisterHandler<DeathHandler>();
+            EventBus.RegisterHandler<ExperienceHandler>();
             EventBus.RegisterHandler<TurnHandler>();
         }
 
