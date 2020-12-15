@@ -8,6 +8,7 @@ using roguelike.Actors.Monsters;
 using roguelike.Events;
 using roguelike.Engine;
 using ImageMagick;
+using roguelike.Handlers;
 
 namespace roguelike.Consoles
 {
@@ -100,10 +101,11 @@ namespace roguelike.Consoles
             var health = player.Get<HealthComponent>();
 
             UIConsole.Print(0, 4, $"HP: {health.CurrentHealth}/{health.MaxHealth}");
-            UIConsole.Print(0, 5, $"{"XP: " + experience.Experience, -10}{"Lvl: " + experience.Level,-10}");
-            UIConsole.Print(0, 6, $"{"Nxt lvl: " + experience.ExperienceToNextLevel, -10}");
+            UIConsole.Print(0, 5, $"{"AC: " + (AttackHandler.GetArmorClass(player)), -10}{"ToHit: " + (AttackHandler.GetAttackModifier(player)), -10}");
+            UIConsole.Print(0, 7, $"{"XP: " + experience.Experience, -10}{"Nxt: " + experience.ExperienceToNextLevel, -10}");
+            UIConsole.Print(0, 8, $"{"Level: " + experience.Level, -10}");
 
-            UIConsole.Print(0, 7, $"Dungeon level: {World.CurrentLevelNumber}");
+            UIConsole.Print(0, 9, $"Dungeon level: {World.CurrentLevelNumber}");
 
             var monsters = World.CurrentLevel.GetActors<Monster>().Where(m => {
                 var e = m.Get<EntityComponent>();
