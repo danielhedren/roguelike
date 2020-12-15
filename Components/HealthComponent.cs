@@ -8,6 +8,7 @@ namespace roguelike.Components
 
         public HealthComponent(double maxHealth)
         {
+            maxHealth = maxHealth > 0 ? maxHealth : 1;
             CurrentHealth = MaxHealth = maxHealth;
         }
     }
