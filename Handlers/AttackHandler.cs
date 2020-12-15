@@ -16,6 +16,49 @@ namespace roguelike.Handlers
             Subscribe(typeof(OnMeleeAttackEvent));
         }
 
+        public static int GetArmorClass(Actor actor)
+        {
+            var stats = actor.Get<StatsComponent>();
+
+            var armorClass = stats?.ArmorClass ?? 0;
+
+            if (actor.GetType().IsSubclassOf(typeof(Player)) || actor.GetType() == typeof(Player)) {
+                armorClass += stats?.DexterityModifier ?? 0;
+            }
+
+            return armorClass;
+        }
+
+        public static int GetProficiencyBonus(Actor actor)
+        {
+            var level = actor.Get<ExperienceComponent>()?.Level ?? 0;
+
+            return 1 + (int) System.Math.Ceiling((double)level / 4);
+        }
+
+        public static int GetAttackModifier(Actor actor)
+        {
+            var attackModifier = 0;
+
+            if (actor.GetType().IsSubclassOf(typeof(Monster))) {
+                attackModifier = actor.Get<MeleeAttackComponent>()?.ToHit ?? 0;
+            } else {
+                attackModifier = actor.Get<StatsComponent>()?.StrengthModifier ?? 0;
+                attackModifier += GetProficiencyBonus(actor);
+            }
+
+            return attackModifier;
+        }
+
+        public static int GetAttackDamage(Actor actor)
+        {
+            var attack = actor.Get<MeleeAttackComponent>();
+
+            if (attack == null) return 0;
+
+            return attack.Damage;
+        }
+
         public override void HandleEvent(Event e)
         {
             if (e.GetType() == typeof(BeforeMeleeAttackEvent)) {
@@ -31,7 +74,6 @@ namespace roguelike.Handlers
                     _world.EventBus.Publish(new OnAttackEvadedEvent {
                         Attacker = ev.Attacker,
                         IntendedTarget = ev.IntendedTarget,
-                        Damage = ev.Damage
                     });
 
                     if (ev.InterruptOnCancel) {
@@ -41,14 +83,8 @@ namespace roguelike.Handlers
                     return;
                 }
 
-                var targetAC = ev.IntendedTarget.Get<StatsComponent>()?.ArmorClass ?? 0;
-                var attackModifier = 0;
-
-                if (ev.Attacker.GetType().IsSubclassOf(typeof(Monster))) {
-                    attackModifier = ev.Attacker.Get<MeleeAttackComponent>()?.ToHit ?? 0;
-                } else {
-                    attackModifier = ev.Attacker.Get<StatsComponent>()?.StrengthModifier ?? 0;
-                }
+                var targetAC = GetArmorClass(ev.IntendedTarget);
+                var attackModifier = GetAttackModifier(ev.Attacker);
 
                 var diceRoll = Random.Dice(1, 20, attackModifier);
                 if (diceRoll == 1 || (diceRoll != 20 && diceRoll < targetAC)) {
@@ -66,10 +102,12 @@ namespace roguelike.Handlers
                     return;
                 }
 
+                var damage = GetAttackDamage(ev.Attacker);
+
                 _world.EventBus.Publish(new OnMeleeAttackEvent {
                     Attacker = ev.Attacker,
                     IntendedTarget = ev.IntendedTarget,
-                    Damage = ev.Damage,
+                    Damage = damage,
                     InterruptOnCancel = ev.InterruptOnCancel,
                     Interrupt = ev.Attacker == _world.CurrentLevel.GetActors<Player>().First()
                 });

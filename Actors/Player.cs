@@ -104,7 +104,6 @@ namespace roguelike.Actors
                         Attacker = this,
                         IntendedTarget = attacking,
                         TargetPoint = attackingEntity.Position,
-                        Damage = attack.Damage,
                         ActivateIn = attack.Speed,
                         InterruptOnCancel = true
                     });
