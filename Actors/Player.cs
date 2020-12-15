@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework.Input;
 using roguelike.Actors.Monsters;
 using roguelike.Components;
 using roguelike.Events;
-using roguelike.Utils;
 using roguelike.Engine;
 using SadConsole;
 
@@ -17,7 +16,6 @@ namespace roguelike.Actors
         {
             Components.Add(new EntityComponent(Color.White, Color.Transparent, '@'));
             Components.Add(new MovementComponent());
-            Components.Add(new MeleeAttackComponent(1, 6, 0, 0, 1));
             var stats = new StatsComponent {
                 Strength = 15,
                 Dexterity = 14,
@@ -29,6 +27,7 @@ namespace roguelike.Actors
                 ArmorClass = 10
             };
             Components.Add(stats);
+            Components.Add(new MeleeAttackComponent(1, 1, stats.StrengthModifier, 0, 1));
             Components.Add(new HealthComponent(stats.HitDice + stats.ConstitutionModifier));
             Components.Add(new ExperienceComponent());
         }

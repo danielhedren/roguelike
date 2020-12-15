@@ -1,5 +1,4 @@
 using roguelike.Events;
-using roguelike.Utils;
 using roguelike.Engine;
 using Microsoft.Xna.Framework;
 

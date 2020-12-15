@@ -20,7 +20,7 @@ namespace roguelike.Handlers
             if (experience != null) {
                 var xpGain = ev.Target.Get<StatsComponent>()?.ExperienceGained ?? 0;
 
-                _world.EventBus.Publish(new OnExperienceGainedEvent {
+                _world.EventBus.Publish(new BeforeExperienceGainedEvent {
                     Target = ev.Attacker,
                     Experience = xpGain
                 });

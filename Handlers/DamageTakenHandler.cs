@@ -1,7 +1,5 @@
 using roguelike.Events;
-using roguelike.Utils;
 using roguelike.Engine;
-using roguelike.Actors;
 using roguelike.Components;
 
 namespace roguelike.Handlers

@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using roguelike.Components;
-using roguelike.Utils;
 
 namespace roguelike.Actors.Monsters
 {
@@ -12,7 +11,7 @@ namespace roguelike.Actors.Monsters
             var rand = new System.Random();
 
             Components.Add(new EntityComponent(_colors[rand.Next(_colors.Length)], Color.Transparent, 'r'));
-            Components.Add(new HealthComponent(Random.Dice(1, 4)));
+            Components.Add(new HealthComponent(Utils.Roll(1, 4)));
             var movementComponent = new MovementComponent();
             movementComponent.Speed = 0.8;
             Components.Add(movementComponent);

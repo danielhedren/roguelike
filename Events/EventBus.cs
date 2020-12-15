@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using roguelike.Handlers;
-using roguelike.Utils;
 using roguelike.Engine;
 
 namespace roguelike.Events

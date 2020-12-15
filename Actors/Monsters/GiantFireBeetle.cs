@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using roguelike.Components;
-using roguelike.Utils;
 
 namespace roguelike.Actors.Monsters
 {
@@ -11,7 +10,7 @@ namespace roguelike.Actors.Monsters
             var rand = new System.Random();
 
             Components.Add(new EntityComponent(Color.Red, Color.Transparent, 'b'));
-            Components.Add(new HealthComponent(Random.Dice(1, 6, 1)));
+            Components.Add(new HealthComponent(Utils.Roll(1, 6, 1)));
             Components.Add(new MovementComponent());
             Components.Add(new MeleeAttackComponent {
                 Dice = 1,

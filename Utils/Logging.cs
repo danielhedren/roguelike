@@ -1,4 +1,4 @@
-namespace roguelike.Utils
+namespace roguelike
 {
     public class Logging
     {

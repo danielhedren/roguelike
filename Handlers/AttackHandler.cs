@@ -2,7 +2,6 @@ using System.Linq;
 using roguelike.Actors;
 using roguelike.Components;
 using roguelike.Events;
-using roguelike.Utils;
 using roguelike.Engine;
 using roguelike.Actors.Monsters;
 
@@ -86,7 +85,7 @@ namespace roguelike.Handlers
                 var targetAC = GetArmorClass(ev.IntendedTarget);
                 var attackModifier = GetAttackModifier(ev.Attacker);
 
-                var diceRoll = Random.Dice(1, 20, attackModifier);
+                var diceRoll = Utils.Roll(1, 20, attackModifier);
                 if (diceRoll == 1 || (diceRoll != 20 && diceRoll < targetAC)) {
                     _world.EventBus.Publish(new OnAttackRollFailedEvent {
                         Attacker = ev.Attacker,

@@ -1,7 +1,6 @@
 using roguelike.Components;
 using roguelike.Engine;
 using roguelike.Events;
-using roguelike.Utils;
 
 namespace roguelike.Handlers
 {
@@ -55,7 +54,7 @@ namespace roguelike.Handlers
                 var stats = ev.Target.Get<StatsComponent>();
 
                 if (health != null && stats != null) {
-                    health.MaxHealth += Random.Dice(1, stats.HitDice, stats.ConstitutionModifier);
+                    health.MaxHealth += Utils.Roll(1, stats.HitDice, stats.ConstitutionModifier);
                     health.CurrentHealth = health.MaxHealth;
                 }
             }

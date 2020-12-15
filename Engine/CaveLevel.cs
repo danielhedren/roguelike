@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using roguelike.Actors;
 using roguelike.Actors.Monsters;
 using roguelike.Components;
-using roguelike.Events;
 
 namespace roguelike.Engine
 {
@@ -16,12 +15,17 @@ namespace roguelike.Engine
 
         public override void Initialize()
         {
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < Utils.Roll(3, 6); i++) {
                 Actors.Add(new Rat());
             }
 
-            Actors.Add(new GiantFireBeetle());
-            Actors.Add(new GiantFireBeetle());
+            for (int i = 0; i < Utils.Roll(1, 4); i++) {
+                Actors.Add(new GiantFireBeetle());
+            }
+
+            for (int i = 0; i < Utils.Roll(1, 6); i++) {
+                Actors.Add(new Kobold());
+            }
 
             Actors.Add(new Stairs());
 

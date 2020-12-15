@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using roguelike.Actors;
 using roguelike.Components;
 using roguelike.Events;
-using roguelike.Utils;
 using roguelike.Engine;
 
 namespace roguelike.Handlers
@@ -30,7 +29,7 @@ namespace roguelike.Handlers
                 var ai = ev.Actor.Get<SimpleAIComponent>();
                 var attack = ev.Actor.Get<MeleeAttackComponent>();
 
-                if (entity != null && attack != null && Geometry.IsNextTo(entity.Position, playerEntity.Position))
+                if (entity != null && attack != null && Utils.IsNextTo(entity.Position, playerEntity.Position))
                 {
                     _world.EventBus.Publish(new BeforeMeleeAttackEvent {
                         Attacker = ev.Actor,
@@ -69,8 +68,8 @@ namespace roguelike.Handlers
 
                     if (ai.PlayerLastSeen == null) {
                         to = entity.Entity.Position;
-                        to.X += Random.Next(-1, 2);
-                        to.Y += Random.Next(-1, 2);
+                        to.X += Utils.Next(-1, 2);
+                        to.Y += Utils.Next(-1, 2);
                     }
                     
                     ev.Handled = true;
