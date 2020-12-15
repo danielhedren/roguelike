@@ -36,7 +36,6 @@ namespace roguelike.Handlers
                         Attacker = ev.Actor,
                         IntendedTarget = player,
                         TargetPoint = playerEntity.Entity.Position,
-                        Damage = attack.Damage,
                         ActivateIn = attack.Speed
                     });
 
@@ -44,10 +43,10 @@ namespace roguelike.Handlers
                 }
 
                 if (entity != null && movement != null) {
-                    var cellsToPlayer = level.Map.GetCellsAlongLine(entity.X, entity.Y, playerEntity.X, playerEntity.Y).Skip(1);
                     Point to = entity.Entity.Position;
 
-                    if (cellsToPlayer.Count() > 0 || cellsToPlayer.All(x => x.IsTransparent)) {
+                    var cellsToPlayer = level.Map.GetCellsAlongLine(entity.X, entity.Y, playerEntity.X, playerEntity.Y).Skip(1);
+                    if (cellsToPlayer.Count() >= 0 && cellsToPlayer.Count() < 10 && cellsToPlayer.All(x => x.IsTransparent)) {
                         ai.PlayerLastSeen = playerEntity.Position;
                     } 
 
@@ -63,12 +62,15 @@ namespace roguelike.Handlers
                                 ai.PlayerLastSeen = null;
                             }
                         } catch (System.Exception ex) {
+                            Logging.Log(ex.ToString());
                             ai.PlayerLastSeen = null;
                         }
                     }
 
                     if (ai.PlayerLastSeen == null) {
-                        to = entity.Entity.Position + new Point(Random.Next(-1, 2), Random.Next(-1, 2));
+                        to = entity.Entity.Position;
+                        to.X += Random.Next(-1, 2);
+                        to.Y += Random.Next(-1, 2);
                     }
                     
                     ev.Handled = true;
