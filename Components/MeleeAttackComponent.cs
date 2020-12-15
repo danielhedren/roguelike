@@ -8,7 +8,7 @@ namespace roguelike.Components
         public int Sides { get; set; } = 1;
         public int Modifier { get; set; } = 0;
         public int ToHit { get; set; } = 0;
-        public double Damage { get => Random.Dice(Dice, Sides, Modifier); }
+        public int Damage { get => Random.Dice(Dice, Sides, Modifier); }
         public double Speed { get; set; } = 1;
 
         public MeleeAttackComponent()
