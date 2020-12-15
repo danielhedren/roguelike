@@ -24,7 +24,7 @@ namespace roguelike.Events
         {
             if (Events.Count == 0) return false;
 
-            Events = Events.OrderBy(x => x.ActivateIn).ToList();
+            Events = Events.OrderBy(x => x.ActivateIn).ThenBy(x => x.Id).ToList();
             var e = Events.First();
 
             if (Subscribers.ContainsKey(e.GetType()))
