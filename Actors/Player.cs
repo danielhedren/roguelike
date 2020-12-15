@@ -16,10 +16,9 @@ namespace roguelike.Actors
         public Player()
         {
             Components.Add(new EntityComponent(Color.White, Color.Transparent, '@'));
-            Components.Add(new HealthComponent(10));
             Components.Add(new MovementComponent());
             Components.Add(new MeleeAttackComponent(1, 6, 0, 0, 1));
-            Components.Add(new StatsComponent {
+            var stats = new StatsComponent {
                 Strength = 15,
                 Dexterity = 14,
                 Constitution = 13,
@@ -28,7 +27,9 @@ namespace roguelike.Actors
                 Charisma = 8,
                 HitDice = 10,
                 ArmorClass = 10
-            });
+            };
+            Components.Add(stats);
+            Components.Add(new HealthComponent(stats.HitDice + stats.ConstitutionModifier));
             Components.Add(new ExperienceComponent());
         }
 
