@@ -28,6 +28,12 @@ namespace roguelike.Handlers
                     return;
                 }
 
+                if (ev.From != ev.Actor.Get<EntityComponent>()?.Position) {
+                    _world.EventBus.Cancel(e);
+
+                    return;
+                }
+
                 var actors = _world.CurrentLevel.GetActors<Actor>().Where(x => x.Has<EntityComponent>());
 
                 foreach (var actor in actors)
@@ -62,7 +68,7 @@ namespace roguelike.Handlers
                     return;
                 }
 
-                var entity = ev.Actor.Get<EntityComponent>();
+                var entity = ev.Actor.Get<EntityComponent>();               
                 entity.Position = ev.To;
             }
         }
