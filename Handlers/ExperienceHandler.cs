@@ -7,22 +7,38 @@ namespace roguelike.Handlers
 {
     public class ExperienceHandler : Handler
     {
+        public double ExperienceModifier { get; set; } = 10; // Useful for testing purposes
         public ExperienceHandler(World world) : base(world)
         {
+            Subscribe(typeof(BeforeExperienceGainedEvent));
             Subscribe(typeof(OnExperienceGainedEvent));
             Subscribe(typeof(OnLevelGainedEvent));
         }
 
         public override void HandleEvent(Event e)
         {
-            if (e.GetType() == typeof(OnExperienceGainedEvent))
+            if (e.GetType() == typeof(BeforeExperienceGainedEvent))
+            {
+                var ev = (BeforeExperienceGainedEvent) e;
+
+                _world.EventBus.Publish(new OnExperienceGainedEvent {
+                    Target = ev.Target,
+                    Experience = (int) (ev.Experience * ExperienceModifier)
+                });
+            }
+            else if (e.GetType() == typeof(OnExperienceGainedEvent))
             {
                 var ev = (OnExperienceGainedEvent) e;
 
                 var experience = ev.Target.Get<ExperienceComponent>();
-                if (experience == null) return;
+                if (experience == null) {
+                    _world.EventBus.Cancel(e);
+
+                    return;
+                }
 
                 var level = experience.Level;
+
                 experience.Experience += ev.Experience;
 
                 if (experience.Level != level) {
