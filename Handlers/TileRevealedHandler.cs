@@ -18,7 +18,7 @@ namespace roguelike.Handlers
         {
             var ev = (OnTileRevealedEvent) e;
 
-            var health = _world.CurrentLevel.GetActors<Player>().First().Get<HealthComponent>();
+            var health = _world.Player.Get<HealthComponent>();
             health.CurrentHealth = Math.Min(health.CurrentHealth + 0.5, health.MaxHealth);
         }
     }

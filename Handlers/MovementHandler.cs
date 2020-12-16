@@ -56,7 +56,7 @@ namespace roguelike.Handlers
                     Actor = ev.Actor,
                     From = ev.From,
                     To = ev.To,
-                    Interrupt = ev.Actor == _world.CurrentLevel.GetActors<Player>().First()
+                    Interrupt = ev.Actor == _world.Player
                 });
             } else if (e.GetType() == typeof(OnMovementEvent))
             {

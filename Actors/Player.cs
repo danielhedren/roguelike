@@ -7,6 +7,7 @@ using roguelike.Components;
 using roguelike.Events;
 using roguelike.Engine;
 using SadConsole;
+using roguelike.Actors.Items;
 
 namespace roguelike.Actors
 {
@@ -30,6 +31,7 @@ namespace roguelike.Actors
             Components.Add(new MeleeAttackComponent(1, 1, stats.StrengthModifier, 0, 1));
             Components.Add(new HealthComponent(stats.HitDice + stats.ConstitutionModifier));
             Components.Add(new ExperienceComponent());
+            Components.Add(new InventoryComponent());
         }
 
         public bool ProcessKeyboard(SadConsole.Input.Keyboard info, World world)
@@ -66,16 +68,45 @@ namespace roguelike.Actors
                     ActivateIn = 1
                 });
 
-                handled = true;
+                return true;
+            }
+
+            if (info.IsKeyPressed(Keys.I)) {
+                world.InventoryConsole.Update();
+                SadConsole.Global.CurrentScreen = world.InventoryConsole;
+                SadConsole.Global.CurrentScreen.IsFocused = true;
+
+                return false;
             }
 
             if (info.IsKeyPressed(Keys.Space)) {
                 var stairs = world.CurrentLevel.GetActors<Stairs>().First().Get<EntityComponent>();
+                var playerE = Get<EntityComponent>();
 
-                if (stairs.Position == Get<EntityComponent>().Position) {
+                if (stairs.Position == playerE.Position) {
                     world.DestroyLevel();
                     world.CreateLevel();
-                }   
+
+                    return true;
+                }
+
+                var items = world.CurrentLevel.GetActors<Item>();
+                foreach (var item in items)
+                {
+                    var itemE = item.Get<EntityComponent>();
+
+                    if (itemE == null) continue;
+
+                    if (itemE.Position == playerE.Position)
+                    {
+                        world.EventBus.Publish(new OnItemPickupEvent {
+                            Target = this,
+                            Item = item
+                        });
+
+                        return true;
+                    }
+                }
             }
 
             if (movement != Point.Zero) {

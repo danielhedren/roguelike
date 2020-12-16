@@ -22,7 +22,7 @@ namespace roguelike.Handlers
             {
                 var level = _world.CurrentLevel;
 
-                var player = level.GetActors<Player>().First();
+                var player = _world.Player;
                 var playerEntity = player.Get<EntityComponent>();
                 var entity = ev.Actor.Get<EntityComponent>();
                 var movement = ev.Actor.Get<MovementComponent>();

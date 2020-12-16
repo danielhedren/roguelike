@@ -4,6 +4,7 @@ using roguelike.Components;
 using roguelike.Events;
 using roguelike.Engine;
 using roguelike.Actors.Monsters;
+using roguelike.Actors.Items;
 
 namespace roguelike.Handlers
 {
@@ -13,6 +14,17 @@ namespace roguelike.Handlers
         {
             Subscribe(typeof(BeforeMeleeAttackEvent));
             Subscribe(typeof(OnMeleeAttackEvent));
+        }
+
+        public static Item GetWeapon(Actor actor)
+        {
+            var inventory = actor.Get<InventoryComponent>();
+
+            if (inventory == null) return null;
+
+            var weapon = inventory.EquippedItems.Find(x => x.Get<ItemComponent>()?.Slot == ItemComponent.EquipmentSlot.Weapon);
+
+            return weapon;
         }
 
         public static int GetArmorClass(Actor actor)
@@ -44,18 +56,30 @@ namespace roguelike.Handlers
             } else {
                 attackModifier = actor.Get<StatsComponent>()?.StrengthModifier ?? 0;
                 attackModifier += GetProficiencyBonus(actor);
+                attackModifier += GetWeapon(actor)?.Get<MeleeAttackComponent>()?.ToHit ?? 0;
             }
 
             return attackModifier;
         }
 
-        public static int GetAttackDamage(Actor actor)
+        public int GetAttackDamage(Actor actor)
         {
-            var attack = actor.Get<MeleeAttackComponent>();
+            var damage = 0;
+            var weapon = GetWeapon(actor)?.Get<MeleeAttackComponent>();
+            if (weapon != null)
+            {
+                damage = weapon.Damage;
+            } else {
+                damage = actor.Get<MeleeAttackComponent>()?.Damage ?? 1;
+            }
 
-            if (attack == null) return 0;
+            if (actor == _world.Player) {
+                damage += actor.Get<StatsComponent>()?.StrengthModifier ?? 0;   
+            }
 
-            return attack.Damage;
+            if (damage < 0) damage = 0;
+
+            return damage;
         }
 
         public override void HandleEvent(Event e)
@@ -108,7 +132,7 @@ namespace roguelike.Handlers
                     IntendedTarget = ev.IntendedTarget,
                     Damage = damage,
                     InterruptOnCancel = ev.InterruptOnCancel,
-                    Interrupt = ev.Attacker == _world.CurrentLevel.GetActors<Player>().First()
+                    Interrupt = ev.Attacker == _world.Player
                 });
             } else {
                 var ev = (OnMeleeAttackEvent) e;

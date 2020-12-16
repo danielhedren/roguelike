@@ -12,7 +12,7 @@ using roguelike.Handlers;
 
 namespace roguelike.Consoles
 {
-    class MapConsole : ContainerConsole
+    public class MapConsole : ContainerConsole
     {
         public Console Console { get; }
         public Console UIConsole { get; }
@@ -40,7 +40,7 @@ namespace roguelike.Consoles
         {
             Console.Clear();
 
-            var player = World.CurrentLevel.GetActors<Player>().FirstOrDefault();
+            var player = World.Player;
             if (player != null) {
                 var entity = player.Get<EntityComponent>();
 
@@ -91,7 +91,7 @@ namespace roguelike.Consoles
             UIConsole.Clear();
             UIConsole.Print(0, 0, "Playername");
 
-            var player = World.CurrentLevel.GetActors<Player>().First();
+            var player = World.Player;
             var stats = player.Get<StatsComponent>();
             var experience = player.Get<ExperienceComponent>();
 
@@ -145,7 +145,7 @@ namespace roguelike.Consoles
             }
             
             if (World.CurrentLevel != null) {
-                var player = World.CurrentLevel.GetActors<Player>().FirstOrDefault();
+                var player = World.Player;
 
                 if (player != null) {
                     var handledInput = player.ProcessKeyboard(info, World);

@@ -1,6 +1,7 @@
 using roguelike.Events;
 using roguelike.Engine;
 using Microsoft.Xna.Framework;
+using roguelike.Components;
 
 namespace roguelike.Handlers
 {
@@ -14,6 +15,7 @@ namespace roguelike.Handlers
             Subscribe(typeof(OnDeathEvent));
             Subscribe(typeof(OnExperienceGainedEvent));
             Subscribe(typeof(OnLevelGainedEvent));
+            Subscribe(typeof(OnItemEquippedEvent));
         }
 
         public override void HandleEvent(Event e)
@@ -59,6 +61,13 @@ namespace roguelike.Handlers
                 _world.MessageLog.Add(new MessageLogMessage {
                     Message = $"{ev.GetType().Name}: {ev.Target.GetType().Name} gained {ev.NewLevel - ev.PreviousLevel} level(s)!",
                     Color = Color.LightGreen
+                });
+            } else if (e.GetType() == typeof(OnItemEquippedEvent)) {
+                var ev = (OnItemEquippedEvent) e;
+
+                _world.MessageLog.Add(new MessageLogMessage {
+                    Message = $"{ev.GetType().Name}: {ev.Target.GetType().Name} equipped {ev.Item.Get<ItemComponent>().Name}!",
+                    Color = Color.Yellow
                 });
             }
         }

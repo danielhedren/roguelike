@@ -1,6 +1,7 @@
 using System.Linq;
 using Microsoft.Xna.Framework;
 using roguelike.Actors;
+using roguelike.Actors.Items;
 using roguelike.Actors.Monsters;
 using roguelike.Components;
 
@@ -38,6 +39,16 @@ namespace roguelike.Engine
                     }
                 }
             }
+
+            var playerPos = _world.Player.Get<EntityComponent>().Position;
+
+            var dagger = new Dagger();
+            dagger.Get<EntityComponent>().Position = playerPos;
+            Actors.Add(dagger);
+
+            var sword = new Longsword();
+            sword.Get<EntityComponent>().Position = playerPos;
+            Actors.Add(sword);
         }
     }
 }

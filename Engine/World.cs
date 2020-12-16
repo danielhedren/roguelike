@@ -1,9 +1,7 @@
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using roguelike.Actors;
-using roguelike.Actors.Monsters;
-using roguelike.Components;
+using roguelike.Consoles;
 using roguelike.Events;
 using roguelike.Handlers;
 
@@ -23,7 +21,10 @@ namespace roguelike.Engine
         public List<MessageLogMessage> MessageLog { get; set; } = new List<MessageLogMessage>();
         public List<Handler> Handlers { get; set; } = new List<Handler>();
         public EventBus EventBus { get; set; }
-        private Player _player { get; set; } = new Player();
+        public Player Player { get; set; } = new Player();
+
+        public MapConsole MapConsole { get; set; }
+        public InventoryConsole InventoryConsole { get; set; }
 
         public World()
         {
@@ -37,7 +38,17 @@ namespace roguelike.Engine
             EventBus.RegisterHandler<TileRevealedHandler>();
             EventBus.RegisterHandler<DeathHandler>();
             EventBus.RegisterHandler<ExperienceHandler>();
+            EventBus.RegisterHandler<ItemHandler>();
             EventBus.RegisterHandler<TurnHandler>();
+
+            MapConsole = new MapConsole();
+            MapConsole.World = this;
+
+            InventoryConsole = new InventoryConsole();
+            InventoryConsole.World = this;
+
+            SadConsole.Global.CurrentScreen = MapConsole;
+            SadConsole.Global.CurrentScreen.IsFocused = true;
         }
 
         public void CreateLevel()
@@ -45,7 +56,7 @@ namespace roguelike.Engine
             CurrentLevelNumber++;
             CurrentLevel = new CaveLevel(this, 80, 40);
 
-            CurrentLevel.Actors.Add(_player);
+            CurrentLevel.Actors.Add(Player);
             CurrentLevel.Initialize();
 
             foreach (var actor in CurrentLevel.Actors)

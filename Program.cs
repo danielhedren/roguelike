@@ -28,11 +28,6 @@ namespace roguelike
         {
             var world = new World();
             world.CreateLevel();
-
-            var console = new MapConsole();
-            console.World = world;
-            SadConsole.Global.CurrentScreen = console;
-            SadConsole.Global.CurrentScreen.IsFocused = true;
         }
         static void Update(GameTime gameTime)
         {
