@@ -17,7 +17,6 @@ namespace roguelike.Engine
     {
         public Level CurrentLevel { get; set; }
         public int CurrentLevelNumber { get; set; } = 0;
-        public SadConsole.Console Console { get; set; }
         public List<MessageLogMessage> MessageLog { get; set; } = new List<MessageLogMessage>();
         public List<Handler> Handlers { get; set; } = new List<Handler>();
         public EventBus EventBus { get; set; }
@@ -25,6 +24,7 @@ namespace roguelike.Engine
 
         public MapConsole MapConsole { get; set; }
         public InventoryConsole InventoryConsole { get; set; }
+        public EventConsole EventConsole { get; set; }
 
         public World()
         {
@@ -47,6 +47,9 @@ namespace roguelike.Engine
             InventoryConsole = new InventoryConsole();
             InventoryConsole.World = this;
 
+            EventConsole = new EventConsole();
+            EventConsole.World = this;
+
             SadConsole.Global.CurrentScreen = MapConsole;
             SadConsole.Global.CurrentScreen.IsFocused = true;
         }
@@ -58,10 +61,12 @@ namespace roguelike.Engine
 
             CurrentLevel.Actors.Add(Player);
             CurrentLevel.Initialize();
+            MapConsole.Console.Children.Add(Player.Get<Components.EntityComponent>().Entity);
 
             foreach (var actor in CurrentLevel.Actors)
             {
-                EventBus.Publish(new ActorTurnEvent{
+                EventBus.Publish(new ActorTurnEvent
+                {
                     Actor = actor
                 });
             }

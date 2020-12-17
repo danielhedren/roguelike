@@ -16,9 +16,10 @@ namespace roguelike.Handlers
         {
             if (e.GetType() == typeof(OnItemPickupEvent))
             {
-                var ev = (OnItemPickupEvent) e;
+                var ev = (OnItemPickupEvent)e;
 
-                _world.EventBus.Publish(new ActorTurnEvent {
+                _world.EventBus.Publish(new ActorTurnEvent
+                {
                     Actor = ev.Target,
                     Interrupt = ev.Target == _world.Player
                 });
@@ -30,19 +31,27 @@ namespace roguelike.Handlers
                 if (inventory == null) return;
 
                 inventory.Items.Add(ev.Item);
-                ev.Item.Components.Remove(ev.Item.Get<EntityComponent>());
+
+                var entity = ev.Item.Get<EntityComponent>();
+                if (entity != null)
+                {
+                    ev.Item.Components.Remove(entity);
+                    _world.MapConsole.Console.Children.Remove(entity.Entity);
+                }
 
                 var itemC = ev.Item.Get<ItemComponent>();
                 if (itemC.Slot != ItemComponent.EquipmentSlot.None)
                 {
-                    _world.EventBus.Publish(new BeforeItemEquippedEvent {
+                    _world.EventBus.Publish(new BeforeItemEquippedEvent
+                    {
                         Target = ev.Target,
                         Item = ev.Item
                     });
                 }
-            } else if (e.GetType() == typeof(BeforeItemEquippedEvent))
+            }
+            else if (e.GetType() == typeof(BeforeItemEquippedEvent))
             {
-                var ev = (BeforeItemEquippedEvent) e;
+                var ev = (BeforeItemEquippedEvent)e;
 
                 var inventory = ev.Target.Get<InventoryComponent>();
                 var itemC = ev.Item.Get<ItemComponent>();
@@ -52,13 +61,13 @@ namespace roguelike.Handlers
                 var equippedInSlot = inventory.EquippedItems.Find(x => x.Get<ItemComponent>()?.Slot == itemC.Slot);
                 if (equippedInSlot != null)
                 {
-                    Logging.Log($"Unequipped {equippedInSlot.Get<ItemComponent>().Name}");
                     inventory.EquippedItems.Remove(equippedInSlot);
                 }
 
                 inventory.EquippedItems.Add(ev.Item);
 
-                _world.EventBus.Publish(new OnItemEquippedEvent {
+                _world.EventBus.Publish(new OnItemEquippedEvent
+                {
                     Target = ev.Target,
                     Item = ev.Item
                 });

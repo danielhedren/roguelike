@@ -15,20 +15,22 @@ namespace roguelike.Handlers
             Subscribe(typeof(BeforeMovementEvent));
             Subscribe(typeof(OnMovementEvent));
         }
-        
+
         public override void HandleEvent(Event e)
         {
             if (e.GetType() == typeof(BeforeMovementEvent))
             {
-                var ev = (BeforeMovementEvent) e;
+                var ev = (BeforeMovementEvent)e;
 
-                if (!_world.CurrentLevel.Map.IsWalkable(ev.To.X, ev.To.Y)) {
+                if (!_world.CurrentLevel.Map.IsWalkable(ev.To.X, ev.To.Y))
+                {
                     _world.EventBus.Cancel(e);
-                    
+
                     return;
                 }
 
-                if (ev.From != ev.Actor.Get<EntityComponent>()?.Position) {
+                if (ev.From != ev.Actor.Get<EntityComponent>()?.Position)
+                {
                     _world.EventBus.Cancel(e);
 
                     return;
@@ -45,30 +47,41 @@ namespace roguelike.Handlers
 
                     var health = actor.Get<HealthComponent>();
 
-                    if (entity.Position == ev.To && (health == null || !health.IsDead)) {
+                    if (entity.Position == ev.To && (health == null || !health.IsDead))
+                    {
                         _world.EventBus.Cancel(e);
 
                         return;
                     }
                 }
 
-                _world.EventBus.Publish(new OnMovementEvent {
+                _world.EventBus.Publish(new OnMovementEvent
+                {
                     Actor = ev.Actor,
                     From = ev.From,
                     To = ev.To,
                     Interrupt = ev.Actor == _world.Player
                 });
-            } else if (e.GetType() == typeof(OnMovementEvent))
+            }
+            else if (e.GetType() == typeof(OnMovementEvent))
             {
-                var ev = (OnMovementEvent) e;
+                var ev = (OnMovementEvent)e;
 
-                if (!_world.CurrentLevel.Actors.Contains(ev.Actor)) {
+                if (!_world.CurrentLevel.Actors.Contains(ev.Actor))
+                {
                     _world.EventBus.Cancel(e);
 
                     return;
                 }
 
-                var entity = ev.Actor.Get<EntityComponent>();               
+                var entity = ev.Actor.Get<EntityComponent>();
+
+                if (!entity.IsWalkable)
+                {
+                    _world.CurrentLevel.Map.SetWalkable(entity.X, entity.Y, true);
+                    _world.CurrentLevel.Map.SetWalkable(ev.To.X, ev.To.Y, false);
+                }
+
                 entity.Position = ev.To;
             }
         }

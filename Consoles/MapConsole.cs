@@ -39,45 +39,60 @@ namespace roguelike.Consoles
         public void Draw()
         {
             Console.Clear();
-
             var player = World.Player;
-            if (player != null) {
+            if (player != null)
+            {
                 var entity = player.Get<EntityComponent>();
 
-                World.CurrentLevel.Map.ComputeFov(entity.Position.X, entity.Position.Y, 20, true);
+                World.CurrentLevel.BaseMap.ComputeFov(entity.Position.X, entity.Position.Y, 20, true);
             }
 
-            Console.Children.Clear();
             foreach (var e in World.CurrentLevel.GetComponents<EntityComponent>())
             {
-                if (World.CurrentLevel.Map.IsInFov(e.X, e.Y)) {
-                    Console.Children.Add(e.Entity);
+                if (World.CurrentLevel.BaseMap.IsInFov(e.X, e.Y))
+                {
+                    if (!Console.Children.Contains(e.Entity))
+                    {
+                        Console.Children.Add(e.Entity);
+                    }
+                }
+                else if (!e.StayRevealed)
+                {
+                    Console.Children.Remove(e.Entity);
                 }
             }
 
-            foreach (var cell in World.CurrentLevel.Map.GetAllCells())
+            foreach (var cell in World.CurrentLevel.BaseMap.GetAllCells())
             {
                 if (cell.IsInFov && !cell.IsExplored)
                 {
-                    World.CurrentLevel.Map.SetCellProperties(cell.X, cell.Y, cell.IsTransparent, cell.IsWalkable, true);
-                    
-                    World.EventBus.Publish(new OnTileRevealedEvent {
+                    World.CurrentLevel.BaseMap.SetExplored(cell.X, cell.Y, true);
+
+                    World.EventBus.Publish(new OnTileRevealedEvent
+                    {
                         Tile = new Point(cell.X, cell.Y)
                     });
                 }
 
                 if (cell.IsInFov)
                 {
-                    if (cell.IsWalkable) {
+                    if (cell.IsWalkable)
+                    {
                         Console.Fill(cell.X, cell.Y, 1, Color.Gray, null, '.');
-                    } else {
+                    }
+                    else
+                    {
                         Console.Fill(cell.X, cell.Y, 1, Color.White, Color.Gray, 219);
                     }
-                } else if (cell.IsExplored)
+                }
+                else if (cell.IsExplored)
                 {
-                    if (cell.IsWalkable) {
+                    if (cell.IsWalkable)
+                    {
                         Console.Fill(cell.X, cell.Y, 1, Color.DarkGray, Color.Black, '.');
-                    } else {
+                    }
+                    else
+                    {
                         Console.Fill(cell.X, cell.Y, 1, Color.DarkGray, Color.Black, 219);
                     }
                 }
@@ -95,24 +110,26 @@ namespace roguelike.Consoles
             var stats = player.Get<StatsComponent>();
             var experience = player.Get<ExperienceComponent>();
 
-            UIConsole.Print(0, 2, $"{"Str: " + stats.Strength, -10}{"Dex: " + stats.Dexterity,-10}");
-            UIConsole.Print(0, 3, $"{"Con: " + stats.Constitution, -10}{"Int: " + stats.Intelligence,-10}");
+            UIConsole.Print(0, 2, $"{"Str: " + stats.Strength,-10}{"Dex: " + stats.Dexterity,-10}");
+            UIConsole.Print(0, 3, $"{"Con: " + stats.Constitution,-10}{"Int: " + stats.Intelligence,-10}");
 
             var health = player.Get<HealthComponent>();
 
             UIConsole.Print(0, 4, $"HP: {health.CurrentHealth}/{health.MaxHealth}");
-            UIConsole.Print(0, 5, $"{"AC: " + (AttackHandler.GetArmorClass(player)), -10}{"ToHit: " + (AttackHandler.GetAttackModifier(player)), -10}");
-            UIConsole.Print(0, 7, $"{"XP: " + experience.Experience, -10}{"Nxt: " + experience.ExperienceToNextLevel, -10}");
-            UIConsole.Print(0, 8, $"{"Level: " + experience.Level, -10}");
+            UIConsole.Print(0, 5, $"{"AC: " + (AttackHandler.GetArmorClass(player)),-10}{"ToHit: " + (AttackHandler.GetAttackModifier(player)),-10}");
+            UIConsole.Print(0, 7, $"{"XP: " + experience.Experience,-10}{"Nxt: " + experience.ExperienceToNextLevel,-10}");
+            UIConsole.Print(0, 8, $"{"Level: " + experience.Level,-10}");
 
             UIConsole.Print(0, 9, $"Dungeon level: {World.CurrentLevelNumber}");
 
-            var monsters = World.CurrentLevel.GetActors<Monster>().Where(m => {
+            var monsters = World.CurrentLevel.GetActors<Monster>().Where(m =>
+            {
                 var e = m.Get<EntityComponent>();
                 return World.CurrentLevel.Map.IsInFov(e.X, e.Y);
             }).ToArray();
 
-            for (int i = 0; i < monsters.Count(); i++) {
+            for (int i = 0; i < monsters.Count(); i++)
+            {
                 var monster = monsters[i];
                 var mHealth = monster.Get<HealthComponent>();
                 UIConsole.Print(0, 11 + i, $"{monster.Get<NameComponent>()?.Name} {mHealth.CurrentHealth}/{mHealth.MaxHealth}");
@@ -121,19 +138,24 @@ namespace roguelike.Consoles
             MessageConsole.Clear();
             var line = 0;
             var count = World.MessageLog.Count();
-            foreach (var message in World.MessageLog.TakeLast(5).Reverse()) {
+            foreach (var message in World.MessageLog.TakeLast(5).Reverse())
+            {
                 MessageConsole.Print(0, line++, $"#{count--} {message.Message}", message.Color);
             }
         }
 
         public override bool ProcessKeyboard(SadConsole.Input.Keyboard info)
         {
-            if (info.IsKeyPressed(Keys.R)) {
-                if (!_record) {
+            if (info.IsKeyPressed(Keys.R))
+            {
+                if (!_record)
+                {
                     _record = true;
 
                     _frames = new MagickImageCollection();
-                } else {
+                }
+                else
+                {
                     _record = false;
                     _frames.First().AnimationIterations = 0;
 
@@ -143,14 +165,17 @@ namespace roguelike.Consoles
                     _frames.Write($"recordings/recording_{System.DateTime.Now.ToFileTime()}.gif");
                 }
             }
-            
-            if (World.CurrentLevel != null) {
+
+            if (World.CurrentLevel != null)
+            {
                 var player = World.Player;
 
-                if (player != null) {
+                if (player != null)
+                {
                     var handledInput = player.ProcessKeyboard(info, World);
 
-                    if (handledInput) {
+                    if (handledInput)
+                    {
                         if (_record)
                         {
                             using (var stream = new System.IO.MemoryStream())

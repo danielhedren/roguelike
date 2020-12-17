@@ -1,6 +1,6 @@
 using System.Linq;
 using Microsoft.Xna.Framework;
-using roguelike.Actors;
+using roguelike.Actors.Features;
 using roguelike.Actors.Items;
 using roguelike.Actors.Monsters;
 using roguelike.Components;
@@ -11,20 +11,25 @@ namespace roguelike.Engine
     {
         public CaveLevel(World world, int width, int height) : base(world, width, height)
         {
-            
+            Map = RogueSharp.Map.Create(new RogueSharp.MapCreation.CaveMapCreationStrategy<RogueSharp.Map>(width, height, 45, 2, 3));
+
+            BaseMap = (RogueSharp.Map)Map.Clone();
         }
 
         public override void Initialize()
         {
-            for (int i = 0; i < Utils.Roll(3, 6); i++) {
+            for (int i = 0; i < Utils.Roll(3, 6); i++)
+            {
                 Actors.Add(new Rat());
             }
 
-            for (int i = 0; i < Utils.Roll(1, 4); i++) {
+            for (int i = 0; i < Utils.Roll(1, 4); i++)
+            {
                 Actors.Add(new GiantFireBeetle());
             }
 
-            for (int i = 0; i < Utils.Roll(1, 6); i++) {
+            for (int i = 0; i < Utils.Roll(1, 6); i++)
+            {
                 Actors.Add(new Kobold());
             }
 
@@ -33,8 +38,10 @@ namespace roguelike.Engine
             var rand = new System.Random();
             foreach (var entity in GetComponents<EntityComponent>())
             {
-                foreach (var cell in Map.GetAllCells().OrderBy(x => rand.Next())) {
-                    if (cell.IsWalkable) {
+                foreach (var cell in Map.GetAllCells().OrderBy(x => rand.Next()))
+                {
+                    if (cell.IsWalkable)
+                    {
                         entity.Position = new Point(cell.X, cell.Y);
                     }
                 }

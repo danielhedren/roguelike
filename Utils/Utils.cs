@@ -28,8 +28,10 @@ namespace roguelike
 
             var roll = Roll(number, sides);
 
-            if (match.Groups[3].Success && int.TryParse(match.Groups[4].Value, out modifier)) {
-                switch (match.Groups[3].Value) {
+            if (match.Groups[3].Success && int.TryParse(match.Groups[4].Value, out modifier))
+            {
+                switch (match.Groups[3].Value)
+                {
                     case "*":
                         roll *= modifier;
                         break;
@@ -79,6 +81,19 @@ namespace roguelike
             if (aPos == null || bPos == null) return null;
 
             return Math.Sqrt(Math.Pow(aPos.X - bPos.X, 2) + Math.Pow(aPos.Y - bPos.Y, 2));
+        }
+
+        public static RogueSharp.ICell GetAdjacentWalkable(RogueSharp.Map map, Point point)
+        {
+            foreach (var cell in map.GetBorderCellsInSquare(point.X, point.Y, 1))
+            {
+                if (cell.IsWalkable)
+                {
+                    return cell;
+                }
+            }
+
+            return null;
         }
     }
 }

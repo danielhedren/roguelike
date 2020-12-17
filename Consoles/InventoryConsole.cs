@@ -38,7 +38,8 @@ namespace roguelike.Consoles
             _exitButton.Text = "Back";
             _exitButton.TextAlignment = HorizontalAlignment.Center;
             _exitButton.Position = new Point(Console.Width - _exitButton.Width, Console.Height - _exitButton.Height);
-            _exitButton.Click += (s, e) => {
+            _exitButton.Click += (s, e) =>
+            {
                 SadConsole.Global.CurrentScreen = World.MapConsole;
                 SadConsole.Global.CurrentScreen.IsFocused = true;
             };
@@ -49,13 +50,15 @@ namespace roguelike.Consoles
 
             _itemListBox.SingleClickItemExecute = true;
             _itemListBox.ExclusiveFocus = true;
-            _itemListBox.SelectedItemExecuted += (s, e) => {
-                World.EventBus.Publish(new BeforeItemEquippedEvent {
+            _itemListBox.SelectedItemExecuted += (s, e) =>
+            {
+                World.EventBus.Publish(new BeforeItemEquippedEvent
+                {
                     Target = World.Player,
                     Item = ((ItemItem)e.Item).Item
                 });
 
-                while (World.EventBus.HandleNext()) {}
+                while (World.EventBus.HandleNext()) { }
 
                 Update();
             };
@@ -71,7 +74,8 @@ namespace roguelike.Consoles
 
             foreach (var item in inventory.Items)
             {
-                _itemListBox.Items.Add(new ItemItem {
+                _itemListBox.Items.Add(new ItemItem
+                {
                     Item = item,
                     Equipped = inventory.EquippedItems.Contains(item)
                 });
