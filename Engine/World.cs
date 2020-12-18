@@ -24,7 +24,7 @@ namespace roguelike.Engine
 
         public MapConsole MapConsole { get; set; }
         public InventoryConsole InventoryConsole { get; set; }
-        public EventConsole EventConsole { get; set; }
+        public InspectionConsole EventConsole { get; set; }
 
         public World()
         {
@@ -47,7 +47,7 @@ namespace roguelike.Engine
             InventoryConsole = new InventoryConsole();
             InventoryConsole.World = this;
 
-            EventConsole = new EventConsole();
+            EventConsole = new InspectionConsole();
             EventConsole.World = this;
 
             SadConsole.Global.CurrentScreen = MapConsole;
