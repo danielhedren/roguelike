@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using roguelike.Actors;
 using roguelike.Components;
@@ -31,11 +32,41 @@ namespace roguelike.Handlers
         {
             var stats = actor.Get<StatsComponent>();
 
-            var armorClass = stats?.ArmorClass ?? 0;
+            var armorClass = 0;
 
-            if (actor.GetType().IsSubclassOf(typeof(Player)) || actor.GetType() == typeof(Player))
+            var inventory = actor.Get<InventoryComponent>();
+            var armor = inventory?.EquipmentSlots.Where(x => x.Key == ItemComponent.EquipmentSlot.Armor).Select(x => x.Value).FirstOrDefault();
+            var armorC = armor?.Get<ArmorComponent>();
+
+            if (armorC == null)
             {
-                armorClass += stats?.DexterityModifier ?? 0;
+                armorClass = stats?.ArmorClass ?? 0;
+
+                if (actor.GetType().IsSubclassOf(typeof(Player)) || actor.GetType() == typeof(Player))
+                {
+                    armorClass += stats?.DexterityModifier ?? 0;
+                }
+            }
+            else
+            {
+                armorClass = armorC.ArmorClass;
+                var modifier = 0;
+
+                if (armorC.Modifier == StatsComponent.Stat.Strength)
+                {
+                    modifier = stats?.StrengthModifier ?? 0;
+                }
+                else if (armorC.Modifier == StatsComponent.Stat.Dexterity)
+                {
+                    modifier = stats?.DexterityModifier ?? 0;
+                }
+
+                if (armorC.MaximumModifier != null)
+                {
+                    modifier = Math.Max(modifier, (int)armorC.MaximumModifier);
+                }
+
+                armorClass += modifier;
             }
 
             return armorClass;

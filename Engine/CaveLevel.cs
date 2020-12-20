@@ -56,6 +56,14 @@ namespace roguelike.Engine
             var sword = new Longsword();
             sword.Get<EntityComponent>().Position = playerPos;
             Actors.Add(sword);
+
+            var armor = new LeatherArmor();
+            armor.Get<EntityComponent>().Position = playerPos;
+            Actors.Add(armor);
+
+            var armor2 = new PlateArmor();
+            armor2.Get<EntityComponent>().Position = playerPos;
+            Actors.Add(armor2);
         }
     }
 }

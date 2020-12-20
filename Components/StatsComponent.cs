@@ -2,6 +2,15 @@ namespace roguelike.Components
 {
     public class StatsComponent : Component
     {
+        public enum Stat
+        {
+            Strength,
+            Dexterity,
+            Constitution,
+            Intelligence,
+            Wisdom,
+            Charisma
+        }
         public int Strength { get; set; }
         public int StrengthModifier { get => (Strength - 10) / 2; }
         public int Dexterity { get; set; }
