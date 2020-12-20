@@ -15,6 +15,27 @@ namespace roguelike.Consoles
 
         private Button _exitButton { get; set; }
         private ListBox _itemListBox { get; set; }
+        private ListBox _equippedItemListBox { get; set; }
+        private class EquipmentSlotItem
+        {
+            public Item Item { get; set; }
+            public ItemComponent.EquipmentSlot Slot { get; set; }
+            public override string ToString()
+            {
+                if (Item == null) return $"{Slot}";
+
+                var item = Item.Get<ItemComponent>();
+
+                string description = "";
+                var weapon = Item.Get<MeleeAttackComponent>();
+                if (weapon != null) {
+                    var mod = weapon.Modifier != 0 ? $"{weapon.Modifier:+#;-#}" : null;
+                    description = $"{weapon.Dice}d{weapon.Sides}{mod}";
+                }
+
+                return $"{Slot,-10}{item?.Name,-20}{description,-10}";
+            }
+        }
 
         private class ItemItem
         {
@@ -22,10 +43,10 @@ namespace roguelike.Consoles
             public bool Equipped { get; set; }
             public override string ToString()
             {
-                var item = Item.Get<ItemComponent>();
+                var item = Item?.Get<ItemComponent>();
                 var equippedString = Equipped ? "Equipped" : "";
 
-                return $"{item.Slot,-10}{item.Name,-20}{equippedString,-10}";
+                return $"{item?.Slot,-10}{item?.Name,-20}{equippedString,-10}";
             }
         }
 
@@ -45,17 +66,22 @@ namespace roguelike.Consoles
             };
             Console.Add(_exitButton);
 
-            _itemListBox = new ListBox(40, Program.Height);
+            _equippedItemListBox = new ListBox(40, 10);
+            _equippedItemListBox.Position  = new Point(1, 1);
+            Console.Add(_equippedItemListBox);
+
+            _itemListBox = new ListBox(40, Program.Height - 13);
+            _itemListBox.Position = new Point(1, 12);
             Console.Add(_itemListBox);
 
             _itemListBox.SingleClickItemExecute = true;
-            _itemListBox.ExclusiveFocus = true;
             _itemListBox.SelectedItemExecuted += (s, e) =>
             {
+                var item = (ItemItem)e.Item;
                 World.EventBus.Publish(new BeforeItemEquippedEvent
                 {
                     Target = World.Player,
-                    Item = ((ItemItem)e.Item).Item
+                    Item = item.Item
                 });
 
                 while (World.EventBus.HandleNext()) { }
@@ -67,19 +93,42 @@ namespace roguelike.Consoles
         public void Update()
         {
             _itemListBox.Items.Clear();
+            _equippedItemListBox.Items.Clear();
 
             var inventory = World.Player?.Get<InventoryComponent>();
 
             if (inventory == null) return;
+
+            foreach (var slot in inventory.EquipmentSlots)
+            {
+                _equippedItemListBox.Items.Add(new EquipmentSlotItem
+                {
+                    Item = slot.Value,
+                    Slot = slot.Key
+                });
+            }
 
             foreach (var item in inventory.Items)
             {
                 _itemListBox.Items.Add(new ItemItem
                 {
                     Item = item,
-                    Equipped = inventory.EquippedItems.Contains(item)
+                    Equipped = inventory.EquipmentSlots.ContainsValue(item)
                 });
             }
+        }
+
+        public override bool ProcessKeyboard(SadConsole.Input.Keyboard info)
+        {
+            if (info.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape))
+            {
+                SadConsole.Global.CurrentScreen = World.MapConsole;
+                SadConsole.Global.CurrentScreen.IsFocused = true;
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using roguelike.Components;
 using roguelike.Engine;
 using roguelike.Events;
@@ -58,13 +60,15 @@ namespace roguelike.Handlers
 
                 if (inventory == null || itemC == null) return;
 
-                var equippedInSlot = inventory.EquippedItems.Find(x => x.Get<ItemComponent>()?.Slot == itemC.Slot);
-                if (equippedInSlot != null)
+                if (inventory.EquipmentSlots.ContainsKey(itemC.Slot))
                 {
-                    inventory.EquippedItems.Remove(equippedInSlot);
+                    inventory.EquipmentSlots[itemC.Slot] = ev.Item;
                 }
-
-                inventory.EquippedItems.Add(ev.Item);
+                else
+                {
+                    _world.EventBus.Cancel(e);
+                    return;
+                }
 
                 _world.EventBus.Publish(new OnItemEquippedEvent
                 {

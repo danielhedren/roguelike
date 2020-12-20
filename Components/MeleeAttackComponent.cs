@@ -22,6 +22,6 @@ namespace roguelike.Components
             Speed = speed;
         }
 
-        
+
     }
 }

@@ -7,13 +7,15 @@ namespace roguelike.Actors.Items
     {
         public Dagger()
         {
-            Components.Add(new MeleeAttackComponent {
+            Components.Add(new MeleeAttackComponent
+            {
                 Dice = 1,
                 Sides = 4,
                 Modifier = 0,
                 Speed = 1
             });
-            Components.Add(new ItemComponent {
+            Components.Add(new ItemComponent
+            {
                 Name = "Dagger",
                 Description = "Stab them with the pointy end",
                 Slot = ItemComponent.EquipmentSlot.Weapon,

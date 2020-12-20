@@ -22,7 +22,7 @@ namespace roguelike.Handlers
 
             if (inventory == null) return null;
 
-            var weapon = inventory.EquippedItems.Find(x => x.Get<ItemComponent>()?.Slot == ItemComponent.EquipmentSlot.Weapon);
+            var weapon = inventory.EquipmentSlots.Where(x => x.Key == ItemComponent.EquipmentSlot.Weapon).Select(x => x.Value).FirstOrDefault();
 
             return weapon;
         }
@@ -33,7 +33,8 @@ namespace roguelike.Handlers
 
             var armorClass = stats?.ArmorClass ?? 0;
 
-            if (actor.GetType().IsSubclassOf(typeof(Player)) || actor.GetType() == typeof(Player)) {
+            if (actor.GetType().IsSubclassOf(typeof(Player)) || actor.GetType() == typeof(Player))
+            {
                 armorClass += stats?.DexterityModifier ?? 0;
             }
 
@@ -44,16 +45,19 @@ namespace roguelike.Handlers
         {
             var level = actor.Get<ExperienceComponent>()?.Level ?? 0;
 
-            return 1 + (int) System.Math.Ceiling((double)level / 4);
+            return 1 + (int)System.Math.Ceiling((double)level / 4);
         }
 
         public static int GetAttackModifier(Actor actor)
         {
             var attackModifier = 0;
 
-            if (actor.GetType().IsSubclassOf(typeof(Monster))) {
+            if (actor.GetType().IsSubclassOf(typeof(Monster)))
+            {
                 attackModifier = actor.Get<MeleeAttackComponent>()?.ToHit ?? 0;
-            } else {
+            }
+            else
+            {
                 attackModifier = actor.Get<StatsComponent>()?.StrengthModifier ?? 0;
                 attackModifier += GetProficiencyBonus(actor);
                 attackModifier += GetWeapon(actor)?.Get<MeleeAttackComponent>()?.ToHit ?? 0;
@@ -69,12 +73,15 @@ namespace roguelike.Handlers
             if (weapon != null)
             {
                 damage = weapon.Damage;
-            } else {
+            }
+            else
+            {
                 damage = actor.Get<MeleeAttackComponent>()?.Damage ?? 1;
             }
 
-            if (actor == _world.Player) {
-                damage += actor.Get<StatsComponent>()?.StrengthModifier ?? 0;   
+            if (actor == _world.Player)
+            {
+                damage += actor.Get<StatsComponent>()?.StrengthModifier ?? 0;
             }
 
             if (damage < 0) damage = 0;
@@ -84,22 +91,27 @@ namespace roguelike.Handlers
 
         public override void HandleEvent(Event e)
         {
-            if (e.GetType() == typeof(BeforeMeleeAttackEvent)) {
-                var ev = (BeforeMeleeAttackEvent) e;
+            if (e.GetType() == typeof(BeforeMeleeAttackEvent))
+            {
+                var ev = (BeforeMeleeAttackEvent)e;
 
-                if (!_world.CurrentLevel.Actors.Contains(ev.Attacker)) {
+                if (!_world.CurrentLevel.Actors.Contains(ev.Attacker))
+                {
                     _world.EventBus.Cancel(e);
 
                     return;
                 }
 
-                if (ev.IntendedTarget.Get<EntityComponent>()?.Position != ev.TargetPoint) {
-                    _world.EventBus.Publish(new OnAttackEvadedEvent {
+                if (ev.IntendedTarget.Get<EntityComponent>()?.Position != ev.TargetPoint)
+                {
+                    _world.EventBus.Publish(new OnAttackEvadedEvent
+                    {
                         Attacker = ev.Attacker,
                         IntendedTarget = ev.IntendedTarget,
                     });
 
-                    if (ev.InterruptOnCancel) {
+                    if (ev.InterruptOnCancel)
+                    {
                         _world.EventBus.Publish(new InterruptEvent());
                     }
 
@@ -110,15 +122,18 @@ namespace roguelike.Handlers
                 var attackModifier = GetAttackModifier(ev.Attacker);
 
                 var diceRoll = Utils.Roll(1, 20, attackModifier);
-                if (diceRoll == 1 || (diceRoll != 20 && diceRoll < targetAC)) {
-                    _world.EventBus.Publish(new OnAttackRollFailedEvent {
+                if (diceRoll == 1 || (diceRoll != 20 && diceRoll < targetAC))
+                {
+                    _world.EventBus.Publish(new OnAttackRollFailedEvent
+                    {
                         Attacker = ev.Attacker,
                         IntendedTarget = ev.IntendedTarget,
                         Roll = diceRoll,
                         Required = targetAC
                     });
 
-                    if (ev.InterruptOnCancel) {
+                    if (ev.InterruptOnCancel)
+                    {
                         _world.EventBus.Publish(new InterruptEvent());
                     }
 
@@ -127,26 +142,31 @@ namespace roguelike.Handlers
 
                 var damage = GetAttackDamage(ev.Attacker);
 
-                _world.EventBus.Publish(new OnMeleeAttackEvent {
+                _world.EventBus.Publish(new OnMeleeAttackEvent
+                {
                     Attacker = ev.Attacker,
                     IntendedTarget = ev.IntendedTarget,
                     Damage = damage,
                     InterruptOnCancel = ev.InterruptOnCancel,
                     Interrupt = ev.Attacker == _world.Player
                 });
-            } else {
-                var ev = (OnMeleeAttackEvent) e;
+            }
+            else
+            {
+                var ev = (OnMeleeAttackEvent)e;
 
-                if (!_world.CurrentLevel.Actors.Contains(ev.Attacker)) {
+                if (!_world.CurrentLevel.Actors.Contains(ev.Attacker))
+                {
                     _world.EventBus.Cancel(e);
-                    
+
                     return;
                 }
 
                 var h = ev.IntendedTarget.Get<HealthComponent>();
                 h.CurrentHealth -= ev.Damage;
 
-                _world.EventBus.Publish(new OnDamageTakenEvent {
+                _world.EventBus.Publish(new OnDamageTakenEvent
+                {
                     Attacker = ev.Attacker,
                     Target = ev.IntendedTarget,
                     Damage = ev.Damage
