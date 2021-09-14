@@ -1,3 +1,6 @@
+using System.Linq;
+using System;
+using System.Reflection;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using roguelike.Actors;
@@ -30,16 +33,7 @@ namespace roguelike.Engine
         {
             EventBus = new EventBus(this);
 
-            EventBus.RegisterHandler<MovementHandler>();
-            EventBus.RegisterHandler<SimpleAIHandler>();
-            EventBus.RegisterHandler<AttackHandler>();
-            EventBus.RegisterHandler<MessageLoggingHandler>();
-            EventBus.RegisterHandler<DamageTakenHandler>();
-            EventBus.RegisterHandler<TileRevealedHandler>();
-            EventBus.RegisterHandler<DeathHandler>();
-            EventBus.RegisterHandler<ExperienceHandler>();
-            EventBus.RegisterHandler<ItemHandler>();
-            EventBus.RegisterHandler<TurnHandler>();
+            RegisterHandlers();
 
             MapConsole = new MapConsole();
             MapConsole.World = this;
@@ -52,6 +46,17 @@ namespace roguelike.Engine
 
             SadConsole.Global.CurrentScreen = MapConsole;
             SadConsole.Global.CurrentScreen.IsFocused = true;
+        }
+
+        private void RegisterHandlers()
+        {
+            var genericRegisterHandler = typeof(EventBus).GetMethod("RegisterHandler");
+            var handlerTypes = Assembly.GetAssembly(typeof(Handler)).GetTypes().Where(x => !x.IsAbstract && x.IsSubclassOf(typeof(Handler)));
+            foreach (var type in handlerTypes)
+            {
+                var registerHandler = genericRegisterHandler.MakeGenericMethod(type);
+                registerHandler.Invoke(EventBus, null);
+            }
         }
 
         public void CreateLevel()
