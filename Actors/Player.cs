@@ -107,13 +107,14 @@ namespace roguelike.Actors
 
             if (info.IsKeyPressed(Keys.Space))
             {
-                var stairs = world.CurrentLevel.GetActors<Stairs>().First().Get<EntityComponent>();
                 var playerE = Get<EntityComponent>();
+                var stairs = world.CurrentLevel.GetActors<Stairs>().FirstOrDefault(x => x.Get<EntityComponent>().Position == playerE.Position)?.Get<EntityComponent>();
 
-                if (stairs.Position == playerE.Position)
+                if (stairs != null)
                 {
                     world.DestroyLevel();
                     world.CreateLevel();
+                    world.EventBus.Publish(new InterruptEvent());
 
                     return true;
                 }
