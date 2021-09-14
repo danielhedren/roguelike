@@ -79,6 +79,7 @@ namespace roguelike.Engine
 
         public void DestroyLevel()
         {
+            MapConsole.Console.Children.Clear();
             CurrentLevel.Actors.Clear();
             EventBus.Events.Clear();
         }
